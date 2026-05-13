@@ -2,23 +2,25 @@
 
 # Xonai Compatibility Radar
 
-Xonai Compatibility Radar reads your Apache Spark event logs and tells you how much of your workload the [Xonai Apache Spark Accelerator](https://xonai.io/) supports. Use it to decide which workload is the best to start with.
+Xonai Compatibility Radar reads your Apache Spark event logs and reports how much of your workload the [Xonai Accelerator](https://xonai.io/) supports. Use the results to identify your highest-compatibility workloads and prioritise where acceleration can begin.
 
 ## How it works
 
-Radar parses the physical execution plan from your event work logs by analysing the operators Spark that *actually* ran, not just the queries you wrote. It checks each operator and expression against what Xonai Accelerator supports and calculates how much of your SQL task time is covered. 
+Radar parses the physical execution plan from your event work logs by analysing the operators Spark that *actually* ran, not just the queries you wrote. It checks each operator and expression against what Xonai Accelerator supports and calculates how much of your SQL task time is covered for acceleration.
 
-Radar ships as a self-contained JAR and only reads event logs you point to. It does not access your data, connect to your cluster, or make any external calls. 
+Radar ships as a self-contained JAR with a script to run it and only reads event logs you point to. It does not access your data, connect to your cluster, or make any external calls.
 
 Report is typically ready in seconds.
 
-→ [Download the latest release](https://github.com/xonai-computing/xonai-compatibility-radar/releases) · Email the result at [radar@xonai.io](mailto:radar@xonai.io)
+→ [Download the latest release](https://github.com/xonai-computing/xonai-compatibility-radar/releases)
+
+For a technical review from our engineer, send it to [radar@xonai.io](mailto:radar@xonai.io).
 
 ## Requirements
 
 - Java 8 or later
 - Spark event logs from Spark 3.x and Spark 4.x applications
-    - Supported sources: Apache Spark OSS and Amazon EMR
+  - Supported sources: Apache Spark OSS and Amazon EMR
 
 > NOTE: To ensure the event logs contain the information required by the tool, Spark applications must be run with the configuration `--conf spark.sql.ui.explainMode=formatted`.
 
@@ -39,7 +41,7 @@ Verify the installation:
 
 ## Usage
 
-Point Radar at your event logs and it will analyse them and print the report to the terminal. 
+Point Radar at your event logs and it will analyse them and print the report to the terminal.
 
 ```bash
 ./xonai-radar -i <event-log-path> -o <report-path> [options]
@@ -53,12 +55,12 @@ Point Radar at your event logs and it will analyse them and print the report to 
 
 ### Options
 
-| Option | Description |
-| --- | --- |
-| `--output-format <fmt>` | Output format: `txt` (default) or `csv` |
-| `--show-errors` | Print physical plan parsing errors |
-| `--overwrite-output` | Overwrite existing result files within the specified path |
-| `--help` | Print help information |
+| Option                  | Description                                               |
+|-------------------------|-----------------------------------------------------------|
+| `--output-format <fmt>` | Output format: `txt` (default) or `csv`                   |
+| `--show-errors`         | Print physical plan parsing errors                        |
+| `--overwrite-output`    | Overwrite existing result files within the specified path |
+| `--help`                | Print help information                                    |
 
 Input and output paths support local filesystem, HDFS, Amazon S3, and Google Cloud Storage.
 
@@ -78,7 +80,7 @@ Only needed if your event logs or output are on AWS or GCS:
 
 ### Running in Docker (optional)
 
-Radar can run inside a Docker container with network access fully disabled; useful if your security policy requires isolated execution. 
+Radar can run inside a Docker container with network access fully disabled, making it suitable for environments where your security policy requires isolated execution.
 
 Use `--network none` to disable all network access inside the container. Combined with a read-only mount for the input directory, nothing can leave your infrastructure.
 
@@ -121,7 +123,7 @@ Example:
 
 One row per SQL node type per application. It shows which operators and expressions are supported and how much task time each carries.
 
-A node type may appear multiple times if support varies across query structures. 
+A node type may appear multiple times if support varies across query structures.
 
 | Column             | Description                                                                                |
 |--------------------|--------------------------------------------------------------------------------------------|
@@ -175,7 +177,7 @@ Example:
 
 ### Interpreting Coverage
 
-Coverage is a conservative estimate - true coverage can be higher. 
+Coverage is a conservative estimate - true coverage can be higher.
 
 If any operator in a pipeline stage is unsupported, the entire stage is excluded from Supported Task Time - even if every other operator in that stage is supported.
 
@@ -183,20 +185,18 @@ This is because event logs record the total runtime of each stage, but not how t
 
 ### Share the Report
 
-Send your results to our engineering team - they'll map the results to your specific workload and tell you what's worth accelerating.
-
-→ [radar@xonai.io](mailto:radar@xonai.io)
+Share it with [radar@xonai.io](mailto:radar@xonai.io) for a technical read from the engineer who built the accelerator.
 
 ## Build from Source
 
-The source code is fully open and auditable. If you want to inspect it before running, clone the repo and build it yourself.
+The source code is open and auditable. If you want to inspect it before running, clone the repo and build it yourself.
 
 Requirements:
 
 - Java 8 or later
 - Maven 3.x
 - Spark event logs from Spark 3.x CPU applications
-    - Supported sources: Apache Spark OSS and Amazon EMR
+  - Supported sources: Apache Spark OSS and Amazon EMR
 
 ```
 git clone https://github.com/xonai-computing/xonai-compatibility-radar.git
@@ -204,9 +204,9 @@ cd xonai-compatibility-radar
 ./dev/package.sh
 ```
 
-The package is produced at `target/xonai-radar-<version>.tar.gz`. 
+The package is produced at `target/xonai-radar-<version>.tar.gz`.
 
-From there, follow the [Getting Started](#getting-started) steps to run it.
+Then follow the [Getting Started](#getting-started) steps to run it.
 
 ## License
 
