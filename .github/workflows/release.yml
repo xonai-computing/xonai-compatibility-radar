@@ -1,0 +1,119 @@
+# Copyright 2026 XONAI LTD
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      release-tag: ${{ steps.validate.outputs.release-tag }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: corretto
+          java-version: 8
+
+      - name: Validate
+        id: validate
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          RELEASE_TAG="${{ github.ref }}"
+          EXPECTED_TAG="refs/tags/v${VERSION}"
+          if [ "$RELEASE_TAG" != "$EXPECTED_TAG" ]; then
+            echo "ERROR: Release Tag is '$RELEASE_TAG' but expected '$EXPECTED_TAG'"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "RELEASE_TAG=v$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "release-tag=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build
+        run: |
+          ./dev/package.sh
+          echo "PACKAGE_NAME=xonai-radar-${VERSION}.tar.gz" >> $GITHUB_ENV
+          echo "PACKAGE_PATH=target/xonai-radar-${VERSION}.tar.gz" >> $GITHUB_ENV
+          echo "PACKAGE_CONTENT_TYPE=application/gzip" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "${{ env.RELEASE_TAG }}"
+          release_name: "${{ env.VERSION }} release"
+          draft: true
+          prerelease: false
+          body: |
+            ## Quickstart
+            
+            ```shell
+            # Download, verify and extract.
+            wget https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/xonai-radar-${{ env.VERSION }}.tar.gz
+            echo "<JAR_SHA256> xonai-radar-${{ env.VERSION }}.tar.gz" | sha256sum --check
+            tar -xzvf xonai-radar-${{ env.VERSION }}.tar.gz
+            rm xonai-radar-${{ env.VERSION }}.tar.gz
+            
+            # Run.
+            ./xonai-radar -i /path/to/event/logs -o /path/for/report
+            ```
+
+      - name: Upload Binaries
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: "${{ env.PACKAGE_PATH }}"
+          asset_name: "${{ env.PACKAGE_NAME }}"
+          asset_content_type: "${{ env.PACKAGE_CONTENT_TYPE }}"
+  test:
+    runs-on: ubuntu-latest
+    name: "Test with Java ${{ matrix.java-version }}"
+    needs: release
+    strategy:
+      matrix:
+        java-version: ['8', '11', '17', '25']
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: corretto
+          java-version: ${{ matrix.java-version }}
+
+      - name: Download Binaries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download \
+            -R ${{ github.repository }} \
+            ${{ needs.release.outputs.release-tag }} \
+            -p 'xonai-radar-*.tar.gz'
+          tar -xzvf xonai-radar-*.tar.gz
+
+      - name: Integration tests
+        run: |
+          integration-tests/run.sh $(pwd)

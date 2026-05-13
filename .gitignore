@@ -1,0 +1,7 @@
+.idea/
+.vscode/
+target/
+derby.log
+metastore_db/
+.DS_Store
+dependency-reduced-pom.xml
