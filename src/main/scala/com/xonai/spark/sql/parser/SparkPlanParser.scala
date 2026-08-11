@@ -1427,11 +1427,12 @@ class SparkPlanParser(
     val buildSide = SparkPlanParser.parseBuildSide(arguments(3))
 
     // Parse condition.
+    val conditionStr = arguments(4)
     val condition =
-      if (arguments.size > 5) {
+      if (conditionStr != "false" && conditionStr != "true") {
         Some(
           expressionParser
-            .withInput(left.output ++ right.output)(_.parse(arguments(4)))
+            .withInput(left.output ++ right.output)(_.parse(conditionStr))
             .resolveDataType(BooleanType)
         )
       } else {
