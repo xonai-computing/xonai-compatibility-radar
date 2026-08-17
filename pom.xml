@@ -24,7 +24,7 @@
   <artifactId>xonai-radar</artifactId>
   <name>Xonai Compatibility Radar</name>
   <description>Compatibility tool for the Xonai Spark Accelerator</description>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <packaging>jar</packaging>
 
   <url>https://github.com/xonai-computing/xonai-compatibility-radar</url>

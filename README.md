@@ -29,8 +29,8 @@ For a technical review from our engineer, send it to [radar@xonai.io](mailto:rad
 Install and extract the tool:
 
 ```bash
-wget https://github.com/xonai-computing/xonai-compatibility-radar/releases/download/v1.0.0/xonai-radar-1.0.0.tar.gz
-tar -xzvf xonai-radar-1.0.0.tar.gz
+wget https://github.com/xonai-computing/xonai-compatibility-radar/releases/download/v1.1.0/xonai-radar-1.1.0.tar.gz
+tar -xzvf xonai-radar-1.1.0.tar.gz
 ```
 
 Verify the installation:
