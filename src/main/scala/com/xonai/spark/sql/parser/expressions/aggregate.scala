@@ -1443,10 +1443,19 @@ case class ThetaIntersectionAgg(child: Expression)
 }
 
 /**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.KllSketchAggBase]].
+ */
+trait KllSketchAggBase {
+
+  def kExpr: Option[Expression]
+}
+
+/**
  * [[org.apache.spark.sql.catalyst.expressions.aggregate.KllSketchAggBigint]].
  */
 case class KllSketchAggBigint(child: Expression, kExpr: Option[Expression])
     extends TypedImperativeAggregate
+    with KllSketchAggBase
     with ExpectsInputTypes {
 
   override def dataType: DataType = BinaryType
@@ -1468,6 +1477,7 @@ case class KllSketchAggBigint(child: Expression, kExpr: Option[Expression])
  */
 case class KllSketchAggFloat(child: Expression, kExpr: Option[Expression])
     extends TypedImperativeAggregate
+    with KllSketchAggBase
     with ExpectsInputTypes {
 
   override def dataType: DataType = BinaryType
@@ -1489,6 +1499,7 @@ case class KllSketchAggFloat(child: Expression, kExpr: Option[Expression])
  */
 case class KllSketchAggDouble(child: Expression, kExpr: Option[Expression])
     extends TypedImperativeAggregate
+    with KllSketchAggBase
     with ExpectsInputTypes {
 
   override def dataType: DataType = BinaryType
@@ -1504,6 +1515,308 @@ case class KllSketchAggDouble(child: Expression, kExpr: Option[Expression])
       child = newChildren.head,
       kExpr = kExpr.map(_ => newChildren(1))
     )
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.KllMergeAggBase]].
+ */
+abstract class KllMergeAggBase
+    extends TypedImperativeAggregate
+    with KllSketchAggBase
+    with ExpectsInputTypes {
+
+  def child: Expression
+
+  override def children: IndexedSeq[Expression] = child +: kExpr.toIndexedSeq
+
+  override def dataType: DataType = BinaryType
+
+  override def inputTypes: Seq[DataType] = {
+    val baseTypes = Seq(BinaryType)
+    if (kExpr.isDefined) {
+      baseTypes :+ IntegerType
+    } else {
+      baseTypes
+    }
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.KllMergeAggBigint]].
+ */
+case class KllMergeAggBigint(child: Expression, kExpr: Option[Expression])
+    extends KllMergeAggBase {
+
+  override def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
+    copy(
+      child = newChildren.head,
+      kExpr = kExpr.map(_ => newChildren(1))
+    )
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.KllMergeAggFloat]].
+ */
+case class KllMergeAggFloat(child: Expression, kExpr: Option[Expression])
+    extends KllMergeAggBase {
+
+  override def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
+    copy(
+      child = newChildren.head,
+      kExpr = kExpr.map(_ => newChildren(1))
+    )
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.KllMergeAggDouble]].
+ */
+case class KllMergeAggDouble(child: Expression, kExpr: Option[Expression])
+    extends KllMergeAggBase {
+
+  override def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
+    copy(
+      child = newChildren.head,
+      kExpr = kExpr.map(_ => newChildren(1))
+    )
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.TupleIntersectionAggBase]].
+ */
+abstract class TupleIntersectionAggBase
+    extends TypedImperativeAggregate
+    with ExpectsInputTypes {
+
+  override def dataType: DataType = BinaryType
+
+  override def inputTypes: Seq[DataType] = {
+    Seq(BinaryType, StringType)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.TupleIntersectionAggDouble]].
+ */
+case class TupleIntersectionAggDouble(child: Expression, mode: Expression)
+    extends TupleIntersectionAggBase
+    with BinaryLike[Expression] {
+
+  override def left: Expression = child
+
+  override def right: Expression = mode
+
+  override def withNewChildrenInternal(newLeft: Expression, newRight: Expression): Expression = {
+    copy(child = newLeft, mode = newRight)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.TupleIntersectionAggInteger]].
+ */
+case class TupleIntersectionAggInteger(child: Expression, mode: Expression)
+    extends TupleIntersectionAggBase
+    with BinaryLike[Expression] {
+
+  override def left: Expression = child
+
+  override def right: Expression = mode
+
+  override def withNewChildrenInternal(newLeft: Expression, newRight: Expression): Expression = {
+    copy(child = newLeft, mode = newRight)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.TupleSketchAggBase]].
+ */
+abstract class TupleSketchAggBase
+    extends TypedImperativeAggregate
+    with ExpectsInputTypes {
+
+  def summaryInputType: DataType
+
+  override def dataType: DataType = BinaryType
+
+  override def inputTypes: Seq[DataType] = {
+    val keyInputTypes =
+      TypeSet(
+        ArrayType(IntegerType),
+        ArrayType(LongType),
+        BinaryType,
+        DoubleType,
+        FloatType,
+        IntegerType,
+        LongType,
+        StringType
+      )
+    Seq(keyInputTypes, summaryInputType, IntegerType, StringType)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.TupleSketchAggDouble]].
+ */
+case class TupleSketchAggDouble(
+    key: Expression,
+    summary: Expression,
+    lgNomEntries: Expression,
+    mode: Expression
+) extends TupleSketchAggBase
+    with QuaternaryLike[Expression] {
+
+  override def first: Expression = key
+
+  override def second: Expression = summary
+
+  override def third: Expression = lgNomEntries
+
+  override def fourth: Expression = mode
+
+  override def summaryInputType: DataType = DoubleType
+
+  override def withNewChildrenInternal(
+      newFirst: Expression,
+      newSecond: Expression,
+      newThird: Expression,
+      newFourth: Expression
+  ): Expression = {
+    copy(key = newFirst, summary = newSecond, lgNomEntries = newThird, mode = newFourth)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.TupleSketchAggInteger]].
+ */
+case class TupleSketchAggInteger(
+    key: Expression,
+    summary: Expression,
+    lgNomEntries: Expression,
+    mode: Expression
+) extends TupleSketchAggBase
+    with QuaternaryLike[Expression] {
+
+  override def first: Expression = key
+
+  override def second: Expression = summary
+
+  override def third: Expression = lgNomEntries
+
+  override def fourth: Expression = mode
+
+  override def summaryInputType: DataType = IntegerType
+
+  override def withNewChildrenInternal(
+      newFirst: Expression,
+      newSecond: Expression,
+      newThird: Expression,
+      newFourth: Expression
+  ): Expression = {
+    copy(key = newFirst, summary = newSecond, lgNomEntries = newThird, mode = newFourth)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.TupleUnionAggBase]].
+ */
+abstract class TupleUnionAggBase
+    extends TypedImperativeAggregate
+    with ExpectsInputTypes {
+
+  override def dataType: DataType = BinaryType
+
+  override def inputTypes: Seq[DataType] = {
+    Seq(BinaryType, IntegerType, StringType)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.TupleUnionAggDouble]].
+ */
+case class TupleUnionAggDouble(
+    child: Expression,
+    lgNomEntries: Expression,
+    mode: Expression
+) extends TupleUnionAggBase
+    with TernaryLike[Expression] {
+
+  override def first: Expression = child
+
+  override def second: Expression = lgNomEntries
+
+  override def third: Expression = mode
+
+  override def withNewChildrenInternal(
+      newFirst: Expression,
+      newSecond: Expression,
+      newThird: Expression
+  ): Expression = {
+    copy(child = newFirst, lgNomEntries = newSecond, mode = newThird)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.TupleUnionAggInteger]].
+ */
+case class TupleUnionAggInteger(
+    child: Expression,
+    lgNomEntries: Expression,
+    mode: Expression
+) extends TupleUnionAggBase
+    with TernaryLike[Expression] {
+
+  override def first: Expression = child
+
+  override def second: Expression = lgNomEntries
+
+  override def third: Expression = mode
+
+  override def withNewChildrenInternal(
+      newFirst: Expression,
+      newSecond: Expression,
+      newThird: Expression
+  ): Expression = {
+    copy(child = newFirst, lgNomEntries = newSecond, mode = newThird)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.VectorAggregateBase]].
+ */
+trait VectorAggregateBase
+    extends AggregateFunction
+    with UnaryLike[Expression]
+    with ExpectsInputType {
+
+  override def inputType: DataType = ArrayType(FloatType)
+
+  override def dataType: DataType = ArrayType(FloatType)
+
+  override def aggBufferDataTypes: IndexedSeq[DataType] = {
+    IndexedSeq(BinaryType, LongType)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.VectorAvg]].
+ */
+case class VectorAvg(child: Expression) extends VectorAggregateBase {
+
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.VectorSum]].
+ */
+case class VectorSum(child: Expression) extends VectorAggregateBase {
+
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
   }
 }
 

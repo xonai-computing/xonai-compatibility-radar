@@ -1073,15 +1073,41 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
     "listagg(id#0, null, 0, 0)" parseIs ListAgg(id0, "null", IndexedSeq.empty)
     "listagg(id#0, null, id#0 DESC NULLS LAST, 0, 0)" parseIs
       ListAgg(id0, "null", IndexedSeq(SortOrder(id0, Descending, NullsLast)))
+
     "theta_sketch_agg(id#0, 12, 0, 0)" parseIs ThetaSketchAgg(id0, "12")
     "theta_union_agg(id#0, 12, 0, 0)" parseIs ThetaUnionAgg(id0, "12")
     "theta_intersection_agg(id#0, 0, 0)" parseIs ThetaIntersectionAgg(id0)
+
     "kll_sketch_agg_bigint(id#0, None, 0, 0)" parseIs KllSketchAggBigint(id0, None)
     "kll_sketch_agg_bigint(id#0, Some(400), 0, 0)" parseIs KllSketchAggBigint(id0, Some("400"))
     "kll_sketch_agg_float(id#0, None, 0, 0)" parseIs KllSketchAggFloat(id0, None)
     "kll_sketch_agg_float(id#0, Some(400), 0, 0)" parseIs KllSketchAggFloat(id0, Some("400"))
     "kll_sketch_agg_double(id#0, None, 0, 0)" parseIs KllSketchAggDouble(id0, None)
     "kll_sketch_agg_double(id#0, Some(400), 0, 0)" parseIs KllSketchAggDouble(id0, Some("400"))
+
+    "kll_merge_agg_bigint(id#0, None, 0, 0)" parseIs KllMergeAggBigint(id0, None)
+    "kll_merge_agg_bigint(id#0, Some(400), 0, 0)" parseIs KllMergeAggBigint(id0, Some("400"))
+    "kll_merge_agg_float(id#0, None, 0, 0)" parseIs KllMergeAggFloat(id0, None)
+    "kll_merge_agg_float(id#0, Some(400), 0, 0)" parseIs KllMergeAggFloat(id0, Some("400"))
+    "kll_merge_agg_double(id#0, None, 0, 0)" parseIs KllMergeAggDouble(id0, None)
+    "kll_merge_agg_double(id#0, Some(400), 0, 0)" parseIs KllMergeAggDouble(id0, Some("400"))
+
+    "tuple_intersection_agg_double(id#0, sum, 0, 0)" parseIs
+      TupleIntersectionAggDouble(id0, "sum")
+    "tuple_intersection_agg_integer(id#0, sum, 0, 0)" parseIs
+      TupleIntersectionAggInteger(id0, "sum")
+
+    "tuple_sketch_agg_double(id#0, 2.5, 12, sum, 0, 0)" parseIs
+      TupleSketchAggDouble(id0, "2.5", "12", "sum")
+    "tuple_sketch_agg_integer(id#0, 2, 12, sum, 0, 0)" parseIs
+      TupleSketchAggInteger(id0, "2", "12", "sum")
+
+    "tuple_union_agg_double(id#0, 12, sum, 0, 0)" parseIs TupleUnionAggDouble(id0, "12", "sum")
+    "tuple_union_agg_integer(id#0, 12, sum, 0, 0)" parseIs TupleUnionAggInteger(id0, "12", "sum")
+
+    "vector_avg(id#0, 0, 0)" parseIs VectorAvg(id0)
+    "vector_sum(id#0, 0, 0)" parseIs VectorSum(id0)
+
     "schema_of_variant_agg(id#0, 0, 0)" parseIs SchemaOfVariantAgg(id0)
   }
 
@@ -1621,6 +1647,11 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
 
     "dayname(id#0)" parseIs DayName(id0)
     "monthname(id#0)" parseIs MonthName(id0)
+
+    "time_bucket(INTERVAL '15' MINUTE, 2024-01-01 11:27:00, id#0, None)" parseIs
+      TimeBucket("INTERVAL '15' MINUTE", "2024-01-01 11:27:00", id0, None)
+    "time_bucket(INTERVAL '15' MINUTE, 2024-01-01 11:27:00, id#0, Some(Europe/Lisbon))" parseIs
+      TimeBucket("INTERVAL '15' MINUTE", "2024-01-01 11:27:00", id0, Some("Europe/Lisbon"))
   }
 
   test("Decimal expressions") {
@@ -2364,11 +2395,17 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
   }
 
   test("Spatial expressions") {
-    "static_invoke(STUtils.stAsBinary(id#0))" parseIs ST_AsBinary(id0)
+    "static_invoke(STUtils.stAsBinary(id#0))" parseIs ST_AsBinary(id0, "NDR")
+    "static_invoke(STUtils.stGeogAsBinary(id#0, NDR))" parseIs ST_AsBinary(id0, "NDR")
+    "static_invoke(STUtils.stGeomAsBinary(id#0, XDR))" parseIs ST_AsBinary(id0, "XDR")
     "static_invoke(STUtils.stGeogFromWKB(id#0))" parseIs ST_GeogFromWKB(id0)
     "static_invoke(STUtils.stGeomFromWKB(id#0))" parseIs ST_GeomFromWKB(id0)
     "static_invoke(STUtils.stSrid(id#0))" parseIs ST_Srid(id0)
+    "static_invoke(STUtils.stGeogSrid(id#0))" parseIs ST_Srid(id0)
+    "static_invoke(STUtils.stGeomSrid(id#0))" parseIs ST_Srid(id0)
     "static_invoke(STUtils.stSetSrid(id#0, 4326))" parseIs ST_SetSrid(id0, "4326")
+    "static_invoke(STUtils.stGeogSetSrid(id#0, 4326))" parseIs ST_SetSrid(id0, "4326")
+    "static_invoke(STUtils.stGeomSetSrid(id#0, 4326))" parseIs ST_SetSrid(id0, "4326")
   }
 
   test("String expressions") {
@@ -2589,6 +2626,47 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
     "tryeval(id#0)" parseIs TryEval(id0)
   }
 
+  test("Tuple difference expressions") {
+    "tuple_difference_double(id#0, 0x05)" parseIs TupleDifferenceDouble(id0, "0x05")
+    "tuple_difference_integer(id#0, 0x05)" parseIs TupleDifferenceInteger(id0, "0x05")
+    "tuple_difference_theta_double(id#0, 0x05)" parseIs TupleDifferenceThetaDouble(id0, "0x05")
+    "tuple_difference_theta_integer(id#0, 0x05)" parseIs TupleDifferenceThetaInteger(id0, "0x05")
+  }
+
+  test("Tuple intersection expressions") {
+    "tuple_intersection_double(id#0, 0x05, sum)" parseIs
+      TupleIntersectionDouble(id0, "0x05", "sum")
+    "tuple_intersection_integer(id#0, 0x05, sum)" parseIs
+      TupleIntersectionInteger(id0, "0x05", "sum")
+    "tuple_intersection_theta_double(id#0, 0x05, sum)" parseIs
+      TupleIntersectionThetaDouble(id0, "0x05", "sum")
+    "tuple_intersection_theta_integer(id#0, 0x05, sum)" parseIs
+      TupleIntersectionThetaInteger(id0, "0x05", "sum")
+  }
+
+  test("Tuple sketch estimate expressions") {
+    "tuple_sketch_estimate_double(id#0)" parseIs TupleSketchEstimateDouble(id0)
+    "tuple_sketch_estimate_integer(id#0)" parseIs TupleSketchEstimateInteger(id0)
+    "tuple_sketch_theta_double(id#0)" parseIs TupleSketchThetaDouble(id0)
+    "tuple_sketch_theta_integer(id#0)" parseIs TupleSketchThetaInteger(id0)
+  }
+
+  test("Tuple sketch summary expressions") {
+    "tuple_sketch_summary_double(id#0, sum)" parseIs TupleSketchSummaryDouble(id0, "sum")
+    "tuple_sketch_summary_integer(id#0, sum)" parseIs TupleSketchSummaryInteger(id0, "sum")
+  }
+
+  test("Tuple union expressions") {
+    "tuple_union_double(id#0, 0x05, 12, sum)" parseIs
+      TupleUnionDouble(id0, "0x05", "12", "sum")
+    "tuple_union_integer(id#0, 0x05, 12, sum)" parseIs
+      TupleUnionInteger(id0, "0x05", "12", "sum")
+    "tuple_union_theta_double(id#0, 0x05, 12, sum)" parseIs
+      TupleUnionThetaDouble(id0, "0x05", "12", "sum")
+    "tuple_union_theta_integer(id#0, 0x05, 12, sum)" parseIs
+      TupleUnionThetaInteger(id0, "0x05", "12", "sum")
+  }
+
   test("Url expressions") {
     "staticinvoke(" +
       "class org.apache.spark.sql.catalyst.expressions.UrlCodec$, " +
@@ -2637,6 +2715,38 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
     "try_variant_get(id#0, $.a, IntegerType, false, Some(Europe/Lisbon))" parseIs
       VariantGet(id0, "$.a", IntegerType, failOnError = false)
     "static_invoke(SchemaOfVariant.schemaOfVariant(id#0))" parseIs SchemaOfVariant(id0)
+    "static_invoke(VariantExpressionEvalUtils.isValidVariant(id#0))" parseIs IsValidVariant(id0)
+  }
+
+  test("Vector expressions") {
+    "static_invoke(" +
+      "VectorFunctionImplUtils.vectorCosineSimilarity(" +
+      "id#0, " +
+      "array(4.0, 5.0, 6.0), " +
+      "vector_cosine_similarity))" parseIs
+      VectorCosineSimilarity(id0, CreateArray(IndexedSeq("4.0", "5.0", "6.0")))
+    "static_invoke(" +
+      "VectorFunctionImplUtils.vectorInnerProduct(" +
+      "id#0, " +
+      "array(4.0, 5.0, 6.0), " +
+      "vector_inner_product))" parseIs
+      VectorInnerProduct(id0, CreateArray(IndexedSeq("4.0", "5.0", "6.0")))
+    "static_invoke(" +
+      "VectorFunctionImplUtils.vectorL2Distance(" +
+      "id#0, " +
+      "array(4.0, 5.0, 6.0), " +
+      "vector_l2_distance))" parseIs
+      VectorL2Distance(id0, CreateArray(IndexedSeq("4.0", "5.0", "6.0")))
+    "static_invoke(" +
+      "VectorFunctionImplUtils.vectorNorm(" +
+      "id#0, " +
+      "6.0, " +
+      "vector_norm))" parseIs VectorNorm(id0, "6.0")
+    "static_invoke(" +
+      "VectorFunctionImplUtils.vectorNormalize(" +
+      "id#0, " +
+      "6.0, " +
+      "vector_normalize))" parseIs VectorNormalize(id0, "6.0")
   }
 
   test("Window frame") {

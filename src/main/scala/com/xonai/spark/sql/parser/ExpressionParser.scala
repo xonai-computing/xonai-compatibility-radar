@@ -159,6 +159,17 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
       "kll_sketch_agg_bigint" -> unaryOptionParser(KllSketchAggBigint),
       "kll_sketch_agg_float" -> unaryOptionParser(KllSketchAggFloat),
       "kll_sketch_agg_double" -> unaryOptionParser(KllSketchAggDouble),
+      "kll_merge_agg_bigint" -> unaryOptionParser(KllMergeAggBigint),
+      "kll_merge_agg_float" -> unaryOptionParser(KllMergeAggFloat),
+      "kll_merge_agg_double" -> unaryOptionParser(KllMergeAggDouble),
+      "tuple_intersection_agg_double" -> binaryParser(TupleIntersectionAggDouble),
+      "tuple_intersection_agg_integer" -> binaryParser(TupleIntersectionAggInteger),
+      "tuple_sketch_agg_double" -> quaternaryParser(TupleSketchAggDouble),
+      "tuple_sketch_agg_integer" -> quaternaryParser(TupleSketchAggInteger),
+      "tuple_union_agg_double" -> ternaryParser(TupleUnionAggDouble),
+      "tuple_union_agg_integer" -> ternaryParser(TupleUnionAggInteger),
+      "vector_avg" -> unaryParser(VectorAvg),
+      "vector_sum" -> unaryParser(VectorSum),
       "schema_of_variant_agg" -> unaryParser(SchemaOfVariantAgg)
     )
 
@@ -310,6 +321,7 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
       "timestampdiff" -> parseTimestampDiff _,
       "dayname" -> unaryParser(DayName),
       "monthname" -> unaryParser(MonthName),
+      "time_bucket" -> ternaryWithTimeZoneParser(TimeBucket),
 
       // Decimal.
       "UnscaledValue" -> unaryParser(UnscaledValue),
@@ -587,6 +599,34 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
 
       // TryEval.
       "tryeval" -> unaryParser(TryEval),
+
+      // Tuple difference.
+      "tuple_difference_double" -> binaryParser(TupleDifferenceDouble),
+      "tuple_difference_integer" -> binaryParser(TupleDifferenceInteger),
+      "tuple_difference_theta_double" -> binaryParser(TupleDifferenceThetaDouble),
+      "tuple_difference_theta_integer" -> binaryParser(TupleDifferenceThetaInteger),
+
+      // Tuple intersection.
+      "tuple_intersection_double" -> ternaryParser(TupleIntersectionDouble),
+      "tuple_intersection_integer" -> ternaryParser(TupleIntersectionInteger),
+      "tuple_intersection_theta_double" -> ternaryParser(TupleIntersectionThetaDouble),
+      "tuple_intersection_theta_integer" -> ternaryParser(TupleIntersectionThetaInteger),
+
+      // Tuple sketch estimate.
+      "tuple_sketch_estimate_double" -> unaryParser(TupleSketchEstimateDouble),
+      "tuple_sketch_estimate_integer" -> unaryParser(TupleSketchEstimateInteger),
+      "tuple_sketch_theta_double" -> unaryParser(TupleSketchThetaDouble),
+      "tuple_sketch_theta_integer" -> unaryParser(TupleSketchThetaInteger),
+
+      // Tuple sketch summary.
+      "tuple_sketch_summary_double" -> binaryParser(TupleSketchSummaryDouble),
+      "tuple_sketch_summary_integer" -> binaryParser(TupleSketchSummaryInteger),
+
+      // Tuple union.
+      "tuple_union_double" -> quaternaryParser(TupleUnionDouble),
+      "tuple_union_integer" -> quaternaryParser(TupleUnionInteger),
+      "tuple_union_theta_double" -> quaternaryParser(TupleUnionThetaDouble),
+      "tuple_union_theta_integer" -> quaternaryParser(TupleUnionThetaInteger),
 
       // Url.
       "parse_url" -> parseParseUrl _,
@@ -2331,6 +2371,8 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
         IsVariantNull(arguments.head)
       case "schemaOfVariant" =>
         SchemaOfVariant(arguments.head)
+      case "isValidVariant" =>
+        IsValidVariant(arguments.head)
       case "schemaOfXml" =>
         SchemaOfXml(arguments(1))
       case "bitmapBucketNumber" =>
@@ -2384,15 +2426,27 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
       case "getSparkVersion" =>
         SparkVersion()
       case "stAsBinary" =>
-        ST_AsBinary(arguments.head)
+        ST_AsBinary(arguments.head, Literal("NDR"))
+      case "stGeogAsBinary" | "stGeomAsBinary" =>
+        ST_AsBinary(arguments.head, arguments(1))
       case "stGeogFromWKB" =>
         ST_GeogFromWKB(arguments.head)
       case "stGeomFromWKB" =>
         ST_GeomFromWKB(arguments.head)
-      case "stSrid" =>
+      case "stSrid" | "stGeogSrid" | "stGeomSrid" =>
         ST_Srid(arguments.head)
-      case "stSetSrid" =>
+      case "stSetSrid" | "stGeogSetSrid" | "stGeomSetSrid" =>
         ST_SetSrid(arguments.head, arguments(1))
+      case "vectorCosineSimilarity" =>
+        VectorCosineSimilarity(arguments.head, arguments(1))
+      case "vectorInnerProduct" =>
+        VectorInnerProduct(arguments.head, arguments(1))
+      case "vectorL2Distance" =>
+        VectorL2Distance(arguments.head, arguments(1))
+      case "vectorNorm" =>
+        VectorNorm(arguments.head, arguments(1))
+      case "vectorNormalize" =>
+        VectorNormalize(arguments.head, arguments(1))
       case functionName =>
         StaticInvoke(staticObject, AnyType, functionName, arguments)
     }

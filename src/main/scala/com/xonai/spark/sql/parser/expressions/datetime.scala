@@ -991,3 +991,49 @@ case class MonthName(child: Expression) extends GetDateField {
     copy(child = newChild)
   }
 }
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.TimeBucket]].
+ */
+case class TimeBucket(
+    bucketSize: Expression,
+    ts: Expression,
+    originTs: Expression,
+    timeZoneId: Option[String]
+) extends TernaryExpression
+    with ExpectsInputTypes {
+
+  override def first: Expression = bucketSize
+
+  override def second: Expression = ts
+
+  override def third: Expression = originTs
+
+  override def dataType: DataType = ts.dataType
+
+  override def inputTypes: Seq[DataType] = {
+    Seq(
+      DayTimeIntervalType + YearMonthIntervalType,
+      TypeSet.AnyTimestamp,
+      TypeSet.AnyTimestamp
+    )
+  }
+
+  override def resolveDataType(outputType: DataType): Expression = {
+    withNewChildren(
+      IndexedSeq(
+        bucketSize.resolveDataType(DayTimeIntervalType + YearMonthIntervalType),
+        ts.resolveDataType(outputType.intersect(TypeSet.AnyTimestamp)),
+        originTs.resolveDataType(TypeSet.AnyTimestamp)
+      )
+    )
+  }
+
+  override def withNewChildrenInternal(
+      newFirst: Expression,
+      newSecond: Expression,
+      newThird: Expression
+  ): Expression = {
+    copy(bucketSize = newFirst, ts = newSecond, originTs = newThird)
+  }
+}

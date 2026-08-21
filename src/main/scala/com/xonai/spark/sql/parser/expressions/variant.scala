@@ -95,3 +95,18 @@ case class SchemaOfVariant(child: Expression) extends UnaryExpression with Expec
     copy(child = newChild)
   }
 }
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.variant.IsValidVariant]].
+ */
+case class IsValidVariant(child: Expression)
+    extends UnaryExpression
+    with Predicate
+    with ExpectsInputType {
+
+  override def inputType: DataType = VariantType
+
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
+  }
+}
