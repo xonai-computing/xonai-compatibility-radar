@@ -16,21 +16,27 @@
 
 package com.xonai.spark.sql.parser.expressions
 
-import com.xonai.spark.sql.parser.types.{BinaryType, DataType, GeographyType, GeometryType, IntegerType, TypeSet}
+import com.xonai.spark.sql.parser.types.{BinaryType, DataType, GeographyType, GeometryType, IntegerType, StringType, TypeSet}
 
 /**
  * [[org.apache.spark.sql.catalyst.expressions.st.ST_AsBinary]].
  */
-case class ST_AsBinary(geo: Expression) extends UnaryExpression with ExpectsInputType {
+case class ST_AsBinary(geo: Expression, endianness: Expression)
+    extends BinaryExpression
+    with ExpectsInputTypes {
 
-  override def child: Expression = geo
+  override def left: Expression = geo
+
+  override def right: Expression = endianness
 
   override def dataType: DataType = BinaryType
 
-  override def inputType: DataType = TypeSet(GeographyType, GeometryType)
+  override def inputTypes: Seq[DataType] = {
+    Seq(TypeSet(GeographyType, GeometryType), StringType)
+  }
 
-  override def withNewChildInternal(newChild: Expression): Expression = {
-    copy(geo = newChild)
+  override def withNewChildrenInternal(newLeft: Expression, newRight: Expression): Expression = {
+    copy(geo = newLeft, endianness = newRight)
   }
 }
 

@@ -2053,7 +2053,6 @@ class SparkPlanParserSuite
             plan.expressions.foreach { expression =>
               expression.foreach {
                 case expression @ (_: UnknownNode | _: StaticInvoke) =>
-                  println(execution.physicalPlanDescription)
                   println(expression)
                 case _ =>
               }
