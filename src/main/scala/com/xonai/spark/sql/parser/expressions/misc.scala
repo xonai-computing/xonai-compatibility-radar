@@ -186,3 +186,29 @@ case class CallMethodViaReflection(children: IndexedSeq[Expression]) extends Exp
     copy(children = newChildren)
   }
 }
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.Hmac]].
+ */
+case class Hmac(key: Expression, message: Expression, algorithm: Expression)
+    extends Expression
+    with ExpectsInputTypes {
+
+  override def dataType: DataType = BinaryType
+
+  override def children: IndexedSeq[Expression] = {
+    IndexedSeq(key, message, algorithm)
+  }
+
+  override def inputTypes: Seq[DataType] = {
+    Seq(BinaryType, BinaryType, StringType)
+  }
+
+  override def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
+    copy(
+      key = newChildren(0),
+      message = newChildren(1),
+      algorithm = newChildren(2)
+    )
+  }
+}

@@ -425,3 +425,65 @@ case class NullIndex(input: Expression) extends AggregateWindowFunction with Una
     copy(input = newChild)
   }
 }
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.CounterDiffBase]].
+ */
+abstract class CounterDiffBase(val counter: Expression) extends AggregateWindowFunction {
+
+  override def dataType: DataType = counter.dataType
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.CounterDiff]].
+ */
+case class CounterDiff(override val counter: Expression)
+    extends CounterDiffBase(counter)
+    with DataTypeIsInputType {
+
+  override def aggBufferDataTypes: IndexedSeq[DataType] = {
+    IndexedSeq(counter.dataType, counter.dataType)
+  }
+
+  override def inputType: DataType = TypeSet.Numeric
+
+  override def children: IndexedSeq[Expression] = IndexedSeq(counter)
+
+  override def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
+    copy(counter = newChildren.head)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.CounterDiffWithStartTime]].
+ */
+case class CounterDiffWithStartTime(
+    override val counter: Expression,
+    startTime: Expression,
+    timeZoneId: Option[String]
+) extends CounterDiffBase(counter) {
+
+  override def aggBufferDataTypes: IndexedSeq[DataType] = {
+    IndexedSeq(
+      counter.dataType,
+      counter.dataType,
+      startTime.dataType,
+      startTime.dataType
+    )
+  }
+
+  override def children: IndexedSeq[Expression] = IndexedSeq(counter, startTime)
+
+  override def resolveDataType(outputType: DataType): Expression = {
+    withNewChildren(
+      IndexedSeq(
+        counter.resolveDataType(outputType.intersect(TypeSet.Numeric)),
+        startTime.resolveDataType(TypeSet.AnyTimestamp)
+      )
+    )
+  }
+
+  override def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
+    copy(counter = newChildren(0), startTime = newChildren(1))
+  }
+}

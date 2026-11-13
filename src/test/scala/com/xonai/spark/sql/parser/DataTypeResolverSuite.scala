@@ -17,7 +17,7 @@
 package com.xonai.spark.sql.parser
 
 import com.xonai.spark.sql.parser.dsl.expressions._
-import com.xonai.spark.sql.parser.expressions.{Abs, Acos, Acosh, Add, AddMonths, AesDecrypt, AesEncrypt, AggregateExpression, Alias, AmbiguousExpression, And, ApproxTopK, ApproxTopKAccumulate, ApproxTopKCombine, ApproxTopKEstimate, ApproximatePercentile, ArrayAggregate, ArrayAppend, ArrayContains, ArrayDistinct, ArrayExcept, ArrayExists, ArrayFilter, ArrayForAll, ArrayInsert, ArrayIntersect, ArrayJoin, ArrayMax, ArrayMin, ArrayPosition, ArrayRemove, ArrayRepeat, ArraySort, ArrayTransform, ArrayUnion, ArraysOverlap, ArraysZip, Ascending, Ascii, Asin, Asinh, AssertNotNull, AtLeastNNonNulls, Atan, Atan2, Atanh, Attribute, AttributeReference, Average, AvroDataToCatalyst, BRound, Base64, Bin, BinaryPad, BitAndAgg, BitLength, BitOrAgg, BitXorAgg, BitmapAndAgg, BitmapBitPosition, BitmapBucketNumber, BitmapConstructAgg, BitmapCount, BitmapOrAgg, BitwiseAnd, BitwiseCount, BitwiseGet, BitwiseNot, BitwiseOr, BitwiseReverse, BitwiseXor, BloomFilterAggregate, BloomFilterMightContain, BoundReference, CallMethodViaReflection, CaseWhen, Cast, CastTimestampNTZToLong, CatalystDataToAvro, CatalystDataToProtobuf, CatalystToExternalMap, Cbrt, Ceil, CheckOverflow, Chr, Coalesce, Collate, CollectList, CollectSet, Concat, ConcatWs, Conv, ConvertTimezone, Corr, Cos, Cosh, Cot, Count, CountMinSketchAgg, CovPopulation, CovSample, Crc32, CreateArray, CreateExternalRow, CreateMap, CreateNamedStruct, Csc, CsvToStructs, CurrentRow, DateAdd, DateAddInterval, DateAddYMInterval, DateDiff, DateFormatClass, DateFromUnixDate, DateSub, DayName, DayOfMonth, DayOfWeek, DayOfYear, DenseRank, Descending, Divide, DivideDTInterval, DivideInterval, DivideYMInterval, EWM, ElementAt, Elt, Encode, EqualNullSafe, EqualTo, Exp, Explode, Expm1, Expression, ExtractANSIIntervalDays, ExtractANSIIntervalHours, ExtractANSIIntervalMinutes, ExtractANSIIntervalMonths, ExtractANSIIntervalSeconds, ExtractANSIIntervalYears, ExtractIntervalDays, ExtractIntervalHours, ExtractIntervalMinutes, ExtractIntervalMonths, ExtractIntervalSeconds, ExtractIntervalYears, Factorial, FindInSet, First, Flatten, Floor, FormatNumber, FormatString, FromUTCTimestamp, FromUnixTime, GetArrayItem, GetArrayStructFields, GetJsonObject, GetMapValue, GetStructField, GetTimestamp, GreaterThan, GreaterThanOrEqual, Greatest, Hex, HistogramNumeric, HllSketchAgg, HllSketchEstimate, HllUnion, HllUnionAgg, Hour, HyperLogLogCardinality, HyperLogLogInitSimpleAgg, HyperLogLogPlusPlus, Hypot, If, In, InSet, Inline, IntegralDivide, Invoke, IsNaN, IsNotNull, IsNull, IsValidUTF8, IsValidVariant, IsVariantNull, JsonObjectKeys, JsonToStructs, JsonTuple, KllMergeAggBigint, KllMergeAggDouble, KllMergeAggFloat, KllSketchAggBigint, KllSketchAggDouble, KllSketchAggFloat, KllSketchGetNBigint, KllSketchGetNDouble, KllSketchGetNFloat, KllSketchGetQuantileBigint, KllSketchGetQuantileDouble, KllSketchGetQuantileFloat, KllSketchGetRankBigint, KllSketchGetRankDouble, KllSketchGetRankFloat, KllSketchMergeBigint, KllSketchMergeDouble, KllSketchMergeFloat, KllSketchToStringBigint, KllSketchToStringDouble, KllSketchToStringFloat, KnownFloatingPointNormalized, KnownNotContainsNull, KnownNotNull, KnownNullable, Kurtosis, Lag, LambdaFunction, LambdaVariable, Last, LastDay, LastNonNull, Lead, Least, Length, LengthOfJsonArray, LessThan, LessThanOrEqual, Levenshtein, Like, LikeAll, LikeAny, ListAgg, Literal, Log, Log10, Log1p, Log2, Logarithm, Lower, Luhncheck, MakeDTInterval, MakeDate, MakeDecimal, MakeInterval, MakeTime, MakeTimestamp, MakeValidUTF8, MakeYMInterval, MapConcat, MapEntries, MapFilter, MapFromArrays, MapFromEntries, MapKeys, MapValues, MapZipWith, Mask, Max, MaxBy, Md5, MicrosToTimestamp, MillisToTimestamp, Min, MinBy, Minute, Mode, Month, MonthName, MonthsBetween, Multiply, MultiplyDTInterval, MultiplyInterval, MultiplyYMInterval, Murmur3Hash, NTile, NaNvl, NamedLambdaVariable, NewInstance, NextDay, NormalizeNaNAndZero, Not, NotLikeAll, NotLikeAny, NthValue, NullIndex, NullsFirst, NullsLast, OctetLength, Or, Overlay, ParseJson, ParseUrl, PercentRank, Percentile, PercentileDisc, PivotFirst, Pmod, PosExplode, Pow, PreciseTimestampConversion, Product, PromotePrecision, ProtobufDataToCatalyst, Quarter, Quote, RLike, RaiseError, Rand, RandStr, Randn, RangeFrame, Rank, RegExpExtract, RegExpExtractAll, RegExpInStr, RegExpReplace, RegrIntercept, RegrR2, RegrReplacement, RegrSXY, RegrSlope, Remainder, ReplicateRows, Reverse, Rint, Round, RoundCeil, RoundFloor, ST_AsBinary, ST_GeogFromWKB, ST_GeomFromWKB, ST_SetSrid, ST_Srid, SchemaOfCsv, SchemaOfJson, SchemaOfVariant, SchemaOfVariantAgg, SchemaOfXml, Sec, Second, SecondWithFraction, SecondsToTimestamp, Sentences, Sequence, Sha1, Sha2, ShiftLeft, ShiftRight, ShiftRightUnsigned, Shuffle, Signum, Sin, Sinh, Size, Skewness, Slice, SortArray, SortOrder, SoundEx, SpecifiedWindowFrame, Sqrt, Stack, StaticInvoke, StddevPop, StddevSamp, StringDecode, StringInstr, StringLPad, StringLocate, StringRPad, StringRepeat, StringReplace, StringSpace, StringSplit, StringSplitSQL, StringToMap, StringTranslate, StringTrim, StringTrimLeft, StringTrimRight, StructsToCsv, StructsToJson, StructsToXml, Substring, SubstringIndex, Subtract, SubtractDates, SubtractTimestamps, Sum, Tan, Tanh, ThetaDifference, ThetaIntersection, ThetaIntersectionAgg, ThetaSketchAgg, ThetaSketchEstimate, ThetaUnion, ThetaUnionAgg, TimeAdd, TimeBucket, TimeDiff, TimeTrunc, TimestampAdd, TimestampAddYMInterval, TimestampDiff, ToCharacter, ToDegrees, ToNumber, ToRadians, ToTime, ToUTCTimestamp, ToUnixTimestamp, ToVariantObject, TransformKeys, TransformValues, TruncDate, TruncTimestamp, TryEval, TryToNumber, TryValidateUTF8, TupleDifferenceDouble, TupleDifferenceInteger, TupleDifferenceThetaDouble, TupleDifferenceThetaInteger, TupleIntersectionAggDouble, TupleIntersectionAggInteger, TupleIntersectionDouble, TupleIntersectionInteger, TupleIntersectionThetaDouble, TupleIntersectionThetaInteger, TupleSketchAggDouble, TupleSketchAggInteger, TupleSketchEstimateDouble, TupleSketchEstimateInteger, TupleSketchSummaryDouble, TupleSketchSummaryInteger, TupleSketchThetaDouble, TupleSketchThetaInteger, TupleUnionAggDouble, TupleUnionAggInteger, TupleUnionDouble, TupleUnionInteger, TupleUnionThetaDouble, TupleUnionThetaInteger, UnBase64, UnaryMinus, UnaryPositive, UnboundedPreceding, Unhex, UnixDate, UnixMicros, UnixMillis, UnixSeconds, UnixTimestamp, UnknownAggregateFunction, UnknownSQLExpression, UnknownSQLFunction, UnscaledValue, UnwrapOption, Upper, UrlDecode, UrlEncode, ValidateUTF8, VariancePop, VarianceSamp, VariantExplode, VariantGet, VectorAvg, VectorCosineSimilarity, VectorInnerProduct, VectorL2Distance, VectorNorm, VectorNormalize, VectorSum, WeekDay, WeekOfYear, WidthBucket, WindowExpression, WindowSpecDefinition, WrapOption, XPathBoolean, XPathDouble, XPathFloat, XPathInt, XPathList, XPathLong, XPathShort, XPathString, XmlToStructs, XxHash64, Year, YearOfWeek, ZipWith}
+import com.xonai.spark.sql.parser.expressions.{Abs, Acos, Acosh, Add, AddMonths, AesDecrypt, AesEncrypt, AggregateExpression, Alias, AmbiguousExpression, And, ApproxTopK, ApproxTopKAccumulate, ApproxTopKCombine, ApproxTopKEstimate, ApproximatePercentile, ArrayAggregate, ArrayAppend, ArrayContains, ArrayDistinct, ArrayExcept, ArrayExists, ArrayFilter, ArrayForAll, ArrayInsert, ArrayIntersect, ArrayJoin, ArrayMax, ArrayMin, ArrayPosition, ArrayRemove, ArrayRepeat, ArraySort, ArrayTransform, ArrayUnion, ArraysOverlap, ArraysZip, Ascending, Ascii, Asin, Asinh, AssertNotNull, AtLeastNNonNulls, Atan, Atan2, Atanh, Attribute, AttributeReference, Average, AvroDataToCatalyst, BRound, Base32, Base64, Bin, BinaryPad, BitAndAgg, BitLength, BitOrAgg, BitXorAgg, BitmapAndAgg, BitmapBitPosition, BitmapBucketNumber, BitmapConstructAgg, BitmapCount, BitmapOrAgg, BitwiseAnd, BitwiseCount, BitwiseGet, BitwiseNot, BitwiseOr, BitwiseReverse, BitwiseXor, BloomFilterAggregate, BloomFilterMightContain, BoundReference, CallMethodViaReflection, CaseWhen, Cast, CastTimestampNTZToLong, CatalystDataToAvro, CatalystDataToProtobuf, CatalystToExternalMap, Cbrt, Ceil, CheckOverflow, Chr, Coalesce, Collate, CollectList, CollectSet, CollectUnion, Concat, ConcatWs, Conv, ConvertTimezone, Corr, Cos, Cosh, Cot, Count, CountMinSketchAgg, CounterDiff, CounterDiffWithStartTime, CovPopulation, CovSample, Crc32, CreateArray, CreateExternalRow, CreateMap, CreateNamedStruct, Csc, CsvToStructs, CurrentRow, DateAdd, DateAddInterval, DateAddYMInterval, DateDiff, DateFormatClass, DateFromUnixDate, DateSub, DayName, DayOfMonth, DayOfWeek, DayOfYear, DenseRank, Descending, Divide, DivideDTInterval, DivideInterval, DivideYMInterval, EWM, ElementAt, Elt, Encode, EqualNullSafe, EqualTo, Exp, Explode, Expm1, Expression, ExtractANSIIntervalDays, ExtractANSIIntervalHours, ExtractANSIIntervalMinutes, ExtractANSIIntervalMonths, ExtractANSIIntervalSeconds, ExtractANSIIntervalYears, ExtractIntervalDays, ExtractIntervalHours, ExtractIntervalMinutes, ExtractIntervalMonths, ExtractIntervalSeconds, ExtractIntervalYears, Factorial, FindInSet, First, Flatten, Floor, FormatNumber, FormatString, FromUTCTimestamp, FromUnixTime, GetArrayItem, GetArrayStructFields, GetJsonObject, GetMapValue, GetStructField, GetTimestamp, GreaterThan, GreaterThanOrEqual, Greatest, Hex, HistogramNumeric, HllSketchAgg, HllSketchEstimate, HllUnion, HllUnionAgg, Hmac, Hour, HyperLogLogCardinality, HyperLogLogInitSimpleAgg, HyperLogLogPlusPlus, Hypot, If, In, InSet, Inline, IntegralDivide, Invoke, IsNaN, IsNotNull, IsNull, IsValidUTF8, IsValidVariant, IsVariantNull, JaroWinkler, JsonObjectKeys, JsonToStructs, JsonTuple, KllMergeAggBigint, KllMergeAggDouble, KllMergeAggFloat, KllSketchAggBigint, KllSketchAggDouble, KllSketchAggFloat, KllSketchGetNBigint, KllSketchGetNDouble, KllSketchGetNFloat, KllSketchGetQuantileBigint, KllSketchGetQuantileDouble, KllSketchGetQuantileFloat, KllSketchGetRankBigint, KllSketchGetRankDouble, KllSketchGetRankFloat, KllSketchMergeBigint, KllSketchMergeDouble, KllSketchMergeFloat, KllSketchToStringBigint, KllSketchToStringDouble, KllSketchToStringFloat, KnownFloatingPointNormalized, KnownNotContainsNull, KnownNotNull, KnownNullable, Kurtosis, Lag, LambdaFunction, LambdaVariable, Last, LastDay, LastNonNull, Lead, Least, Length, LengthOfJsonArray, LessThan, LessThanOrEqual, Levenshtein, Like, LikeAll, LikeAny, ListAgg, Literal, Log, Log10, Log1p, Log2, Logarithm, Lower, Luhncheck, MakeDTInterval, MakeDate, MakeDecimal, MakeInterval, MakeTime, MakeTimestamp, MakeValidUTF8, MakeYMInterval, MapConcat, MapEntries, MapFilter, MapFromArrays, MapFromEntries, MapKeys, MapValues, MapZipWith, Mask, Max, MaxBy, Md5, MicrosToTimestamp, MillisToTimestamp, Min, MinBy, Minute, Mode, Month, MonthName, MonthsBetween, Multiply, MultiplyDTInterval, MultiplyInterval, MultiplyYMInterval, Murmur3Hash, NTile, NaNvl, NamedLambdaVariable, NanosToTimestamp, NewInstance, NextDay, NormalizeNaNAndZero, Not, NotLikeAll, NotLikeAny, NthValue, NullIndex, NullsFirst, NullsLast, OctetLength, Or, Overlay, ParseJson, ParseUrl, PercentRank, Percentile, PercentileDisc, PivotFirst, Pmod, PosExplode, Pow, PreciseTimestampConversion, Product, PromotePrecision, ProtobufDataToCatalyst, Quarter, Quote, RLike, RaiseError, Rand, RandStr, Randn, RangeFrame, Rank, RegExpExtract, RegExpExtractAll, RegExpInStr, RegExpReplace, RegrIntercept, RegrR2, RegrReplacement, RegrSXY, RegrSlope, Remainder, ReplicateRows, Reverse, Rint, Round, RoundCeil, RoundFloor, ST_AsBinary, ST_GeogFromWKB, ST_GeomFromWKB, ST_SetSrid, ST_Srid, SchemaOfCsv, SchemaOfJson, SchemaOfVariant, SchemaOfVariantAgg, SchemaOfXml, Sec, Second, SecondWithFraction, SecondsToTimestamp, Sentences, Sequence, Sha1, Sha2, ShiftLeft, ShiftRight, ShiftRightUnsigned, Shuffle, Signum, Sin, Sinh, Size, Skewness, Slice, SortArray, SortOrder, SoundEx, SpecifiedWindowFrame, Sqrt, Stack, StaticInvoke, StddevPop, StddevSamp, StringDecode, StringInstr, StringLPad, StringLocate, StringRPad, StringRepeat, StringReplace, StringSpace, StringSplit, StringSplitSQL, StringToMap, StringTranslate, StringTrim, StringTrimLeft, StringTrimRight, StructsToCsv, StructsToJson, StructsToXml, Substring, SubstringIndex, Subtract, SubtractDates, SubtractTimestamps, Sum, Tan, Tanh, ThetaDifference, ThetaIntersection, ThetaIntersectionAgg, ThetaSketchAgg, ThetaSketchEstimate, ThetaUnion, ThetaUnionAgg, TimeAdd, TimeBucket, TimeDiff, TimeTrunc, TimestampAdd, TimestampAddYMInterval, TimestampDiff, ToCharacter, ToDegrees, ToNumber, ToRadians, ToTime, ToUTCTimestamp, ToUnixTimestamp, ToVariantObject, TransformKeys, TransformValues, TruncDate, TruncTimestamp, TryEval, TryToNumber, TryValidateUTF8, TupleDifferenceDouble, TupleDifferenceInteger, TupleDifferenceThetaDouble, TupleDifferenceThetaInteger, TupleIntersectionAggDouble, TupleIntersectionAggInteger, TupleIntersectionDouble, TupleIntersectionInteger, TupleIntersectionThetaDouble, TupleIntersectionThetaInteger, TupleSketchAggDouble, TupleSketchAggInteger, TupleSketchEstimateDouble, TupleSketchEstimateInteger, TupleSketchSummaryDouble, TupleSketchSummaryInteger, TupleSketchThetaDouble, TupleSketchThetaInteger, TupleUnionAggDouble, TupleUnionAggInteger, TupleUnionDouble, TupleUnionInteger, TupleUnionThetaDouble, TupleUnionThetaInteger, UnBase32, UnBase64, UnaryMinus, UnaryPositive, UnboundedPreceding, Unhex, UnixDate, UnixMicros, UnixMillis, UnixNanos, UnixSeconds, UnixTimestamp, UnknownAggregateFunction, UnknownSQLExpression, UnknownSQLFunction, UnscaledValue, UnwrapOption, Upper, UrlDecode, UrlEncode, ValidateUTF8, VariancePop, VarianceSamp, VariantArrayAppend, VariantDelete, VariantExplode, VariantGet, VariantInsert, VariantSet, VariantStripNulls, VectorAvg, VectorCosineSimilarity, VectorInnerProduct, VectorL2Distance, VectorNorm, VectorNormalize, VectorSum, WeekDay, WeekOfYear, WidthBucket, WindowExpression, WindowSpecDefinition, WrapOption, XPathBoolean, XPathDouble, XPathFloat, XPathInt, XPathList, XPathLong, XPathShort, XPathString, XmlToStructs, XxHash64, Year, YearOfWeek, ZipWith}
 import com.xonai.spark.sql.parser.types.{AnyType, ArrayType, BinaryType, BooleanType, ByteType, CalendarIntervalType, DataType, DateType, DayTimeIntervalType, DecimalType, DoubleType, FloatType, GeographyType, GeometryType, IntegerType, LongType, MapType, NullType, ObjectType, ShortType, StringType, StructField, StructType, TimeType, TimestampLTZNanosType, TimestampNTZNanosType, TimestampNTZType, TimestampType, TypeSet, VariantType, YearMonthIntervalType}
 import org.scalactic.source.Position
 import org.scalatest.funsuite.AnyFunSuite
@@ -950,6 +950,12 @@ class DataTypeResolverSuite extends AnyFunSuite {
   test("resolveDataType - CollectSet") {
     val expr = CollectSet(AttributeReference("id", AnyType))
     assert(expr.dataType == ArrayType(AnyType))
+    assert(expr.resolveDataType(AnyType).dataType == ArrayType(AnyType))
+    assert(expr.resolveDataType(ArrayType(LongType)).dataType == ArrayType(LongType))
+  }
+
+  test("resolveDataType - CollectUnion") {
+    val expr = CollectUnion(AttributeReference("id", AnyType), ignoreNulls = true)
     assert(expr.resolveDataType(AnyType).dataType == ArrayType(AnyType))
     assert(expr.resolveDataType(ArrayType(LongType)).dataType == ArrayType(LongType))
   }
@@ -2816,6 +2822,11 @@ class DataTypeResolverSuite extends AnyFunSuite {
     assert(expr.resolveDataType(AnyType).child.dataType == TypeSet.Integral)
   }
 
+  test("resolveDataType - NanosToTimestamp") {
+    val expr = NanosToTimestamp(AttributeReference("id", AnyType))
+    assert(expr.resolveDataType(AnyType).child.dataType == TypeSet.Integral + DecimalType)
+  }
+
   test("resolveDataType - UnixSeconds") {
     val expr = UnixSeconds(AttributeReference("id", AnyType))
     val resolved = expr.resolveDataType(LongType)
@@ -2837,6 +2848,12 @@ class DataTypeResolverSuite extends AnyFunSuite {
     val expr = UnixMicros(AttributeReference("id", AnyType))
     val resolved = expr.resolveDataType(LongType)
     assert(resolved.child.dataType == TypeSet.AnyTimestamp ++ TypeSet.AnyTimestampNano)
+  }
+
+  test("resolveDataType - UnixNanos") {
+    val expr = UnixNanos(AttributeReference("id", AnyType))
+    val resolved = expr.resolveDataType(DecimalType)
+    assert(resolved.child.dataType == TypeSet.AnyTimestampNano)
   }
 
   test("resolveDataType - DateAdd") {
@@ -4971,6 +4988,18 @@ class DataTypeResolverSuite extends AnyFunSuite {
     )
   }
 
+  test("resolveDataType - Hmac") {
+    val expr = Hmac(
+      AttributeReference("key", AnyType),
+      AttributeReference("message", AnyType),
+      AttributeReference("algorithm", AnyType)
+    )
+    val resolved = expr.resolveDataType(AnyType)
+    assert(resolved.child(0).dataType == BinaryType)
+    assert(resolved.child(1).dataType == BinaryType)
+    assert(resolved.child(2).dataType == StringType)
+  }
+
   test("resolveDataType - Coalesce") {
     val expr = Coalesce(
       IndexedSeq(
@@ -5632,6 +5661,16 @@ class DataTypeResolverSuite extends AnyFunSuite {
     assert(resolved.child(2).dataType == IntegerType)
   }
 
+  test("resolveDataType - JaroWinkler") {
+    val expr = JaroWinkler(
+      AttributeReference("left", AnyType),
+      AttributeReference("right", AnyType)
+    )
+    val resolved = expr.resolveDataType(AnyType)
+    assert(resolved.child(0).dataType == StringType)
+    assert(resolved.child(1).dataType == StringType)
+  }
+
   test("resolveDataType - SoundEx") {
     val expr = SoundEx(AttributeReference("id", AnyType))
     assert(expr.resolveDataType(AnyType).child.dataType == StringType)
@@ -5654,6 +5693,16 @@ class DataTypeResolverSuite extends AnyFunSuite {
 
   test("resolveDataType - UnBase64") {
     val expr = UnBase64(AttributeReference("id", AnyType))
+    assert(expr.resolveDataType(AnyType).child.dataType == StringType)
+  }
+
+  test("resolveDataType - Base32") {
+    val expr = Base32(AttributeReference("id", AnyType))
+    assert(expr.resolveDataType(AnyType).child.dataType == BinaryType)
+  }
+
+  test("resolveDataType - UnBase32") {
+    val expr = UnBase32(AttributeReference("id", AnyType))
     assert(expr.resolveDataType(AnyType).child.dataType == StringType)
   }
 
@@ -6090,6 +6139,73 @@ class DataTypeResolverSuite extends AnyFunSuite {
     assert(resolved.child(1).dataType == StringType)
   }
 
+  test("resolveDataType - VariantDelete") {
+    val expr = VariantDelete(
+      IndexedSeq(
+        AttributeReference("variant", AnyType),
+        AttributeReference("path0", AnyType),
+        AttributeReference("path1", AnyType),
+        AttributeReference("path2", AnyType)
+      )
+    )
+    val resolved = expr.resolveDataType(AnyType)
+    assert(resolved.child(0).dataType == VariantType)
+    assert(resolved.child(1).dataType == StringType)
+    assert(resolved.child(2).dataType == StringType)
+    assert(resolved.child(3).dataType == StringType)
+  }
+
+  test("resolveDataType - VariantInsert") {
+    val expr = VariantInsert(
+      AttributeReference("input", AnyType),
+      AttributeReference("path", AnyType),
+      AttributeReference("value", AnyType),
+      failOnError = true
+    )
+    val resolved = expr.resolveDataType(AnyType)
+    assert(resolved.child(0).dataType == VariantType)
+    assert(resolved.child(1).dataType == StringType)
+    assert(resolved.child(2).dataType == AnyType)
+  }
+
+  test("resolveDataType - VariantSet") {
+    val expr = VariantSet(
+      AttributeReference("input", AnyType),
+      AttributeReference("path", AnyType),
+      AttributeReference("value", AnyType),
+      AttributeReference("createIfMissing", AnyType),
+      failOnError = true
+    )
+    val resolved = expr.resolveDataType(AnyType)
+    assert(resolved.child(0).dataType == VariantType)
+    assert(resolved.child(1).dataType == StringType)
+    assert(resolved.child(2).dataType == AnyType)
+    assert(resolved.child(3).dataType == BooleanType)
+  }
+
+  test("resolveDataType - VariantArrayAppend") {
+    val expr = VariantArrayAppend(
+      AttributeReference("input", AnyType),
+      AttributeReference("path", AnyType),
+      AttributeReference("value", AnyType),
+      failOnError = true
+    )
+    val resolved = expr.resolveDataType(AnyType)
+    assert(resolved.child(0).dataType == VariantType)
+    assert(resolved.child(1).dataType == StringType)
+    assert(resolved.child(2).dataType == AnyType)
+  }
+
+  test("resolveDataType - VariantStripNulls") {
+    val expr = VariantStripNulls(
+      AttributeReference("child", AnyType),
+      AttributeReference("includeArrays", AnyType)
+    )
+    val resolved = expr.resolveDataType(AnyType)
+    assert(resolved.child(0).dataType == VariantType)
+    assert(resolved.child(1).dataType == BooleanType)
+  }
+
   test("resolveDataType - SchemaOfVariant") {
     val expr = SchemaOfVariant(AttributeReference("id", AnyType))
     assert(expr.resolveDataType(AnyType).child.dataType == VariantType)
@@ -6297,6 +6413,36 @@ class DataTypeResolverSuite extends AnyFunSuite {
     resolved = expr.resolveDataType(LongType)
     assert(resolved.dataType == LongType)
     assert(resolved.child.dataType == LongType)
+  }
+
+  test("resolveDataType - CounterDiff") {
+    val expr = CounterDiff(AttributeReference("id", AnyType))
+
+    var resolved = expr.resolveDataType(AnyType)
+    assert(resolved.dataType == TypeSet.Numeric)
+    assert(resolved.child.dataType == TypeSet.Numeric)
+
+    resolved = expr.resolveDataType(LongType)
+    assert(resolved.dataType == LongType)
+    assert(resolved.child.dataType == LongType)
+  }
+
+  test("resolveDataType - CounterDiffWithStartTime") {
+    val expr = CounterDiffWithStartTime(
+      AttributeReference("counter", AnyType),
+      AttributeReference("startTime", AnyType),
+      None
+    )
+
+    var resolved = expr.resolveDataType(AnyType)
+    assert(resolved.dataType == TypeSet.Numeric)
+    assert(resolved.child(0).dataType == TypeSet.Numeric)
+    assert(resolved.child(1).dataType == TypeSet.AnyTimestamp)
+
+    resolved = expr.resolveDataType(LongType)
+    assert(resolved.dataType == LongType)
+    assert(resolved.child(0).dataType == LongType)
+    assert(resolved.child(1).dataType == TypeSet.AnyTimestamp)
   }
 
   test("resolveDataType - XmlToStructs") {

@@ -991,6 +991,8 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
 
     "collect_list(id#0, 0, 0)" parseIs CollectList(id0)
     "collect_set(id#0, 0, 0)" parseIs CollectSet(id0)
+    "collect_union(id#0, 0, 0, true)" parseIs CollectUnion(id0, ignoreNulls = true)
+    "collect_union(id#0, 0, 0, false)" parseIs CollectUnion(id0, ignoreNulls = false)
     "mode(id#0, 0, 0)" parseIs Mode(id0)
     "product(id#0)" parseIs Product(id0)
     "corr(id#0, 1)" parseIs Corr(id0, "1")
@@ -1389,10 +1391,12 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
     "timestamp_seconds(id#0)" parseIs SecondsToTimestamp(id0)
     "timestamp_millis(id#0)" parseIs MillisToTimestamp(id0)
     "timestamp_micros(id#0)" parseIs MicrosToTimestamp(id0)
+    "timestamp_nanos(id#0)" parseIs NanosToTimestamp(id0)
     "unix_seconds(id#0)" parseIs UnixSeconds(id0)
     "cast_timestamp_ntz_to_long(id#0)" parseIs CastTimestampNTZToLong(id0)
     "unix_millis(id#0)" parseIs UnixMillis(id0)
     "unix_micros(id#0)" parseIs UnixMicros(id0)
+    "unix_nanos(id#0)" parseIs UnixNanos(id0)
     "date_add(id#0, 5)" parseIs DateAdd(id0, "5")
     "date_sub(id#0, 5)" parseIs DateSub(id0, "5")
     "next_day(id#0, TU)" parseIs NextDay(id0, "TU")
@@ -2229,6 +2233,9 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
       "ExpressionImplUtils.aesDecrypt(" +
       "id#0, 0x30303030313131313232323233333333, GCM, DEFAULT, 0x))" parseIs
       AesDecrypt(id0, "0x30303030313131313232323233333333", "GCM", "DEFAULT", "0x")
+
+    "static_invoke(ExpressionImplUtils.hmac(id#0, message#1, SHA-256))" parseIs
+      Hmac(id0, AttributeReference("message", 1), "SHA-256")
   }
 
   test("Null expressions") {
@@ -2468,6 +2475,10 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
     "octet_length(id#0)" parseIs OctetLength(id0)
     "levenshtein(id#0, , None)" parseIs Levenshtein(id0, "", None)
     "levenshtein(id#0, 1, Some(2))" parseIs Levenshtein(id0, "1", Some("2"))
+
+    "static_invoke(ExpressionImplUtils.jaroWinklerSimilarity(id#0, MARTHA))" parseIs
+      JaroWinkler(id0, "MARTHA")
+
     "soundex(id#0)" parseIs SoundEx(id0)
     "ascii(id#0)" parseIs Ascii(id0)
     "chr(id#0)" parseIs Chr(id0)
@@ -2475,6 +2486,10 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
     "base64(id#0)" parseIs Base64(id0)
     "unbase64(id#0)" parseIs UnBase64(id0)
     "unbase64(id#0, false)" parseIs UnBase64(id0)
+
+    "static_invoke(Base32.encode(id#0))" parseIs Base32(id0)
+    "static_invoke(UnBase32.decode(id#0))" parseIs UnBase32(id0)
+
     "format_number(id#0, ####.##)" parseIs FormatNumber(id0, "####.##")
     "stringsplitsql(id#0, .)" parseIs StringSplitSQL(id0, ".")
 
@@ -2716,6 +2731,24 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
       VariantGet(id0, "$.a", IntegerType, failOnError = false)
     "static_invoke(SchemaOfVariant.schemaOfVariant(id#0))" parseIs SchemaOfVariant(id0)
     "static_invoke(VariantExpressionEvalUtils.isValidVariant(id#0))" parseIs IsValidVariant(id0)
+    "variant_delete(id#0, null)" parseIs
+      VariantDelete(IndexedSeq(id0, "null"))
+    "variant_delete(id#0, null, $.a, $.c)" parseIs
+      VariantDelete(IndexedSeq(id0, "null", "$.a", "$.c"))
+    "variant_insert(id#0, $.b, 2, true)" parseIs
+      VariantInsert(id0, "$.b", "2", failOnError = true)
+    "try_variant_insert(id#0, $.b, 2, false)" parseIs
+      VariantInsert(id0, "$.b", "2", failOnError = false)
+    "variant_set(id#0, $.a, 2, true, true)" parseIs
+      VariantSet(id0, "$.a", "2", "true", failOnError = true)
+    "try_variant_set(id#0, $.a, 2, true, false)" parseIs
+      VariantSet(id0, "$.a", "2", "true", failOnError = false)
+    "variant_array_append(id#0, $, 4, true)" parseIs
+      VariantArrayAppend(id0, "$", "4", failOnError = true)
+    "try_variant_array_append(id#0, $, 4, false)" parseIs
+      VariantArrayAppend(id0, "$", "4", failOnError = false)
+    "static_invoke(VariantExpressionEvalUtils.stripNulls(id#0, true))" parseIs
+      VariantStripNulls(id0, "true")
   }
 
   test("Vector expressions") {
@@ -2900,6 +2933,9 @@ class ExpressionParserSuite extends AnyFunSuite with DataTypeAssertions with Tes
     "ewm(id#0, 0.5, true)" parseIs EWM(id0, 0.5, ignoreNA = true)
     "ewm(id#0, 0.5, false)" parseIs EWM(id0, 0.5, ignoreNA = false)
     "last_non_null(id#0)" parseIs LastNonNull(id0)
+    "counter_diff(id#0)" parseIs CounterDiff(id0)
+    "counter_diff(id#0, s#1, Some(Europe/Lisbon))" parseIs
+      CounterDiffWithStartTime(id0, AttributeReference("s", 1), Some("Europe/Lisbon"))
   }
 
   test("XML expressions") {

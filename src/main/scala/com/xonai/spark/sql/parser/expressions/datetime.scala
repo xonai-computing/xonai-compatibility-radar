@@ -17,7 +17,7 @@
 package com.xonai.spark.sql.parser.expressions
 
 import com.xonai.spark.sql.parser.types.TypeSet.{AnyTime, AnyTimestampNano}
-import com.xonai.spark.sql.parser.types.{BooleanType, ByteType, CalendarIntervalType, DataType, DateType, DayTimeIntervalType, DecimalType, DoubleType, IntegerType, LongType, ShortType, StringType, TimestampNTZType, TimestampType, TypeSet, YearMonthIntervalType}
+import com.xonai.spark.sql.parser.types.{BooleanType, ByteType, CalendarIntervalType, DataType, DateType, DayTimeIntervalType, DecimalType, DoubleType, IntegerType, LongType, ShortType, StringType, TimestampLTZNanosType, TimestampNTZType, TimestampType, TypeSet, YearMonthIntervalType}
 
 /**
  * [[org.apache.spark.sql.catalyst.expressions.CurrentTimeZone]].
@@ -296,6 +296,20 @@ case class MicrosToTimestamp(child: Expression) extends UnaryExpression with Exp
 }
 
 /**
+ * [[org.apache.spark.sql.catalyst.expressions.NanosToTimestamp]].
+ */
+case class NanosToTimestamp(child: Expression) extends UnaryExpression with ExpectsInputType {
+
+  override def dataType: DataType = TimestampLTZNanosType
+
+  override def inputType: DataType = TypeSet.Integral + DecimalType
+
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
+  }
+}
+
+/**
  * [[org.apache.spark.sql.catalyst.expressions.UnixSeconds]].
  */
 case class UnixSeconds(child: Expression) extends UnaryExpression with ExpectsInputType {
@@ -345,6 +359,20 @@ case class UnixMicros(child: Expression) extends UnaryExpression with ExpectsInp
   override def dataType: DataType = LongType
 
   override def inputType: DataType = TypeSet.AnyTimestamp ++ TypeSet.AnyTimestampNano
+
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.UnixNanos]].
+ */
+case class UnixNanos(child: Expression) extends UnaryExpression with ExpectsInputType {
+
+  override def dataType: DataType = DecimalType
+
+  override def inputType: DataType = TypeSet.AnyTimestampNano
 
   override def withNewChildInternal(newChild: Expression): Expression = {
     copy(child = newChild)
