@@ -16,7 +16,7 @@
 
 package com.xonai.spark.sql.parser
 
-import com.xonai.spark.sql.parser.types.{AnyType, ArrayType, BinaryType, BooleanType, ByteType, CalendarIntervalType, DataType, DataTypeUtils, DateType, DayTimeIntervalType, DecimalType, DoubleType, FloatType, GeographyType, GeometryType, IntegerType, LongType, MapType, NullType, ObjectType, ShortType, StringType, StructField, StructType, TimeType, TimestampNTZType, TimestampType, UnknownType, VariantType, YearMonthIntervalType}
+import com.xonai.spark.sql.parser.types.{AnyType, ArrayType, BinaryType, BooleanType, ByteType, CalendarIntervalType, DataType, DataTypeUtils, DateType, DayTimeIntervalType, DecimalType, DoubleType, FloatType, GeographyType, GeometryType, IntegerType, LongType, MapType, NullType, ObjectType, ShortType, StringType, StructField, StructType, TimeType, TimestampLTZNanosType, TimestampNTZNanosType, TimestampNTZType, TimestampType, UnknownType, VariantType, YearMonthIntervalType}
 import org.apache.spark.sql.catalyst.parser.CatalystSqlParser
 
 import javax.lang.model.SourceVersion
@@ -45,6 +45,8 @@ object DataTypeParser extends Parser {
       .replaceAll("time\\(\\d\\)", s"struct<${placeholderPrefix}_time:int>")
       .replaceAll("geography\\(\\d+\\)", s"struct<${placeholderPrefix}_geography:int>")
       .replaceAll("geometry\\(\\d+\\)", s"struct<${placeholderPrefix}_geometry:int>")
+      .replaceAll("timestamp_ntz\\(\\d+\\)", s"struct<${placeholderPrefix}_timestamp_ntz:int>")
+      .replaceAll("timestamp_ltz\\(\\d+\\)", s"struct<${placeholderPrefix}_timestamp_ltz:int>")
 
     val sparkDataType = Try(CatalystSqlParser.parseDataType(rewritten))
     if (sparkDataType.isSuccess) {
@@ -63,6 +65,10 @@ object DataTypeParser extends Parser {
               GeographyType
             } else if (placeholder.endsWith("geometry")) {
               GeometryType
+            } else if (placeholder.endsWith("timestamp_ntz")) {
+              TimestampNTZNanosType
+            } else if (placeholder.endsWith("timestamp_ltz")) {
+              TimestampLTZNanosType
             } else {
               structType
             }
@@ -157,6 +163,10 @@ object DataTypeParser extends Parser {
         TimestampType
       case "TimestampNTZType" =>
         TimestampNTZType
+      case _ if str.startsWith("TimestampNTZNanosType") =>
+        TimestampNTZNanosType
+      case _ if str.startsWith("TimestampLTZNanosType") =>
+        TimestampLTZNanosType
       case "CalendarIntervalType" =>
         CalendarIntervalType
       case _ if str.startsWith("DayTimeIntervalType") =>

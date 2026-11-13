@@ -92,6 +92,10 @@ object DataTypeUtils {
             GeometryType
           case _ if className.startsWith("VariantType") =>
             VariantType
+          case _ if className.startsWith("TimestampLTZNanosType") =>
+            TimestampLTZNanosType
+          case _ if className.startsWith("TimestampNTZNanosType") =>
+            TimestampNTZNanosType
           case _ =>
             UnknownType(dataType.toString)
         }
