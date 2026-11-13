@@ -16,7 +16,7 @@
 
 package com.xonai.spark.sql.parser.expressions
 
-import com.xonai.spark.sql.parser.types.{ArrayType, BinaryType, BooleanType, DataType, IntegerType, LongType, StringType, TypeSet}
+import com.xonai.spark.sql.parser.types.{ArrayType, BinaryType, BooleanType, DataType, DoubleType, IntegerType, LongType, StringType, TypeSet}
 
 /**
  * [[org.apache.spark.sql.catalyst.expressions.ConcatWs]].
@@ -633,6 +633,22 @@ case class Levenshtein(left: Expression, right: Expression, threshold: Option[Ex
 }
 
 /**
+ * [[org.apache.spark.sql.catalyst.expressions.JaroWinkler]].
+ */
+case class JaroWinkler(left: Expression, right: Expression)
+    extends BinaryExpression
+    with ExpectsInputType {
+
+  override def dataType: DataType = DoubleType
+
+  override def inputType: DataType = StringType
+
+  override def withNewChildrenInternal(newLeft: Expression, newRight: Expression): Expression = {
+    copy(left = newLeft, right = newRight)
+  }
+}
+
+/**
  * [[org.apache.spark.sql.catalyst.expressions.SoundEx]].
  */
 case class SoundEx(child: Expression) extends UnaryExpression with ExpectsInputType {
@@ -692,6 +708,34 @@ case class Base64(child: Expression) extends UnaryExpression with ExpectsInputTy
  * [[org.apache.spark.sql.catalyst.expressions.UnBase64]].
  */
 case class UnBase64(child: Expression) extends UnaryExpression with ExpectsInputType {
+
+  override def dataType: DataType = BinaryType
+
+  override def inputType: DataType = StringType
+
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.Base32]].
+ */
+case class Base32(child: Expression) extends UnaryExpression with ExpectsInputType {
+
+  override def dataType: DataType = StringType
+
+  override def inputType: DataType = BinaryType
+
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.UnBase32]].
+ */
+case class UnBase32(child: Expression) extends UnaryExpression with ExpectsInputType {
 
   override def dataType: DataType = BinaryType
 

@@ -106,6 +106,7 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
       "last_value" -> binaryParser(Last.apply),
       "collect_list" -> unaryParser(CollectList),
       "collect_set" -> unaryParser(CollectSet),
+      "collect_union" -> parseCollectUnion _,
       "mode" -> unaryParser(Mode),
       "product" -> unaryParser(Product),
       "corr" -> binaryParser(Corr),
@@ -290,10 +291,12 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
       "timestamp_seconds" -> unaryParser(SecondsToTimestamp),
       "timestamp_millis" -> unaryParser(MillisToTimestamp),
       "timestamp_micros" -> unaryParser(MicrosToTimestamp),
+      "timestamp_nanos" -> unaryParser(NanosToTimestamp),
       "unix_seconds" -> unaryParser(UnixSeconds),
       "cast_timestamp_ntz_to_long" -> unaryParser(CastTimestampNTZToLong),
       "unix_millis" -> unaryParser(UnixMillis),
       "unix_micros" -> unaryParser(UnixMicros),
+      "unix_nanos" -> unaryParser(UnixNanos),
       "date_add" -> binaryParser(DateAdd),
       "date_sub" -> binaryParser(DateSub),
       "next_day" -> binaryParser(NextDay),
@@ -635,6 +638,13 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
       "to_variant_object" -> unaryParser(ToVariantObject),
       "variant_get" -> parseVariantGet _,
       "try_variant_get" -> parseVariantGet _,
+      "variant_delete" -> variableLengthParser(VariantDelete),
+      "variant_insert" -> ternaryParser(VariantInsert(_, _, _, failOnError = true)),
+      "variant_set" -> quaternaryParser(VariantSet(_, _, _, _, failOnError = true)),
+      "variant_array_append" -> ternaryParser(VariantArrayAppend(_, _, _, failOnError = true)),
+      "try_variant_insert" -> ternaryParser(VariantInsert(_, _, _, failOnError = false)),
+      "try_variant_set" -> quaternaryParser(VariantSet(_, _, _, _, failOnError = false)),
+      "try_variant_array_append" -> ternaryParser(VariantArrayAppend(_, _, _, failOnError = false)),
 
       // Window.
       "rank" -> variableLengthParser(Rank),
@@ -649,6 +659,7 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
       "null_index" -> unaryParser(NullIndex),
       "ewm" -> parseEWM _,
       "last_non_null" -> unaryParser(LastNonNull),
+      "counter_diff" -> parseCounterDiff _,
 
       // XML.
       "from_xml" -> parseXmlToStructs _,
@@ -1673,6 +1684,12 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
     AmbiguousExpression(expressions)
   }
 
+  private def parseCollectUnion(str: String): CollectUnion = {
+    val children = parseList(str)
+    require(children.length > 3)
+    CollectUnion(children(0), children(3).asInstanceOf[Literal].booleanValue)
+  }
+
   private def parsePercentile(str: String): Percentile = {
     val children = parseList(str)
     require(children.length > 4)
@@ -2395,6 +2412,12 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
           if staticObject == "Base64" =>
         Base64(arguments.head)
       case "encode"
+          if staticObject == "Base32" =>
+        Base32(arguments.head)
+      case "decode"
+          if staticObject == "UnBase32" =>
+        UnBase32(arguments.head)
+      case "encode"
           if staticObject == "UrlCodec" =>
         UrlEncode(arguments.head)
       case "decode"
@@ -2447,6 +2470,13 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
         VectorNorm(arguments.head, arguments(1))
       case "vectorNormalize" =>
         VectorNormalize(arguments.head, arguments(1))
+      case "hmac" =>
+        Hmac(arguments.head, arguments(1), arguments(2))
+      case "jaroWinklerSimilarity" =>
+        JaroWinkler(arguments.head, arguments(1))
+      case "stripNulls"
+          if staticObject == "VariantExpressionEvalUtils" =>
+        VariantStripNulls(arguments.head, arguments(1))
       case functionName =>
         StaticInvoke(staticObject, AnyType, functionName, arguments)
     }
@@ -2729,6 +2759,20 @@ class ExpressionParser(subqueries: String => Option[BaseSubqueryExec]) extends P
       children(1).asInstanceOf[Literal].doubleValue,
       children(2).asInstanceOf[Literal].booleanValue
     )
+  }
+
+  private def parseCounterDiff(str: String): Expression = {
+    val parts = splitSpacedList(str)
+    require(parts.length == 1 || parts.length == 3)
+    if (parts.length == 1) {
+      CounterDiff(parse(parts.head))
+    } else {
+      CounterDiffWithStartTime(
+        parse(parts(0)),
+        parse(parts(1)),
+        getOption(parts(2))
+      )
+    }
   }
 
   private def parseXmlToStructs(str: String): XmlToStructs = {

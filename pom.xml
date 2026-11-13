@@ -445,12 +445,12 @@
   <profiles>
     <profile>
       <!-- Should not be used to release JAR -->
-      <id>spark420</id>
+      <id>spark430</id>
       <properties>
         <java.version>17</java.version>
         <scala.version>2.13.18</scala.version>
         <scala.binary.version>2.13</scala.binary.version>
-        <spark.version>4.2.0</spark.version>
+        <spark.version>4.3.0</spark.version>
         <json4s.version>4.0.7</json4s.version>
         <antlr4.version>4.13.1</antlr4.version>
 
@@ -463,6 +463,7 @@
         <univocity-parsers.version>2.9.1</univocity-parsers.version>
         <lz4.org>at.yawk.lz4</lz4.org>
         <lz4.version>1.11.0</lz4.version>
+        <orc.version>2.3.0</orc.version>
       </properties>
       <dependencies>
         <dependency>
@@ -478,6 +479,18 @@
         </dependency>
 
         <!-- Test dependencies -->
+        <dependency>
+          <groupId>org.apache.spark</groupId>
+          <artifactId>spark-config_${scala.binary.version}</artifactId>
+          <version>${spark.version}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.spark</groupId>
+          <artifactId>spark-udf-worker-core_${scala.binary.version}</artifactId>
+          <version>${spark.version}</version>
+          <scope>test</scope>
+        </dependency>
         <dependency>
           <groupId>org.apache.datasketches</groupId>
           <artifactId>datasketches-java</artifactId>
@@ -495,6 +508,35 @@
           <artifactId>univocity-parsers</artifactId>
           <version>${univocity-parsers.version}</version>
           <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.orc</groupId>
+          <artifactId>orc-mapreduce</artifactId>
+          <version>${orc.version}</version>
+          <classifier>shaded-protobuf</classifier>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.apache.hadoop</groupId>
+              <artifactId>hadoop-common</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.apache.hadoop</groupId>
+              <artifactId>hadoop-mapreduce-client-core</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.apache.orc</groupId>
+              <artifactId>orc-core</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>${hive.group}</groupId>
+              <artifactId>hive-storage-api</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId> com.esotericsoftware</groupId>
+              <artifactId>kryo-shaded</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
       </dependencies>
     </profile>

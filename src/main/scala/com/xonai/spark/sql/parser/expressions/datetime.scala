@@ -16,7 +16,8 @@
 
 package com.xonai.spark.sql.parser.expressions
 
-import com.xonai.spark.sql.parser.types.{BooleanType, ByteType, CalendarIntervalType, DataType, DateType, DayTimeIntervalType, DecimalType, DoubleType, IntegerType, LongType, ShortType, StringType, TimestampNTZType, TimestampType, TypeSet, YearMonthIntervalType}
+import com.xonai.spark.sql.parser.types.TypeSet.{AnyTime, AnyTimestampNano}
+import com.xonai.spark.sql.parser.types.{BooleanType, ByteType, CalendarIntervalType, DataType, DateType, DayTimeIntervalType, DecimalType, DoubleType, IntegerType, LongType, ShortType, StringType, TimestampLTZNanosType, TimestampNTZType, TimestampType, TypeSet, YearMonthIntervalType}
 
 /**
  * [[org.apache.spark.sql.catalyst.expressions.CurrentTimeZone]].
@@ -295,13 +296,27 @@ case class MicrosToTimestamp(child: Expression) extends UnaryExpression with Exp
 }
 
 /**
+ * [[org.apache.spark.sql.catalyst.expressions.NanosToTimestamp]].
+ */
+case class NanosToTimestamp(child: Expression) extends UnaryExpression with ExpectsInputType {
+
+  override def dataType: DataType = TimestampLTZNanosType
+
+  override def inputType: DataType = TypeSet.Integral + DecimalType
+
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
+  }
+}
+
+/**
  * [[org.apache.spark.sql.catalyst.expressions.UnixSeconds]].
  */
 case class UnixSeconds(child: Expression) extends UnaryExpression with ExpectsInputType {
 
   override def dataType: DataType = LongType
 
-  override def inputType: DataType = TimestampType
+  override def inputType: DataType = TypeSet.AnyTimestamp ++ TypeSet.AnyTimestampNano
 
   override def withNewChildInternal(newChild: Expression): Expression = {
     copy(child = newChild)
@@ -329,7 +344,7 @@ case class UnixMillis(child: Expression) extends UnaryExpression with ExpectsInp
 
   override def dataType: DataType = LongType
 
-  override def inputType: DataType = TimestampType
+  override def inputType: DataType = TypeSet.AnyTimestamp ++ TypeSet.AnyTimestampNano
 
   override def withNewChildInternal(newChild: Expression): Expression = {
     copy(child = newChild)
@@ -343,7 +358,21 @@ case class UnixMicros(child: Expression) extends UnaryExpression with ExpectsInp
 
   override def dataType: DataType = LongType
 
-  override def inputType: DataType = TimestampType
+  override def inputType: DataType = TypeSet.AnyTimestamp ++ TypeSet.AnyTimestampNano
+
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.UnixNanos]].
+ */
+case class UnixNanos(child: Expression) extends UnaryExpression with ExpectsInputType {
+
+  override def dataType: DataType = DecimalType
+
+  override def inputType: DataType = TypeSet.AnyTimestampNano
 
   override def withNewChildInternal(newChild: Expression): Expression = {
     copy(child = newChild)
@@ -514,7 +543,7 @@ case class DateFormatClass(left: Expression, right: Expression, timeZoneId: Opti
   override def dataType: DataType = StringType
 
   override def inputTypes: Seq[DataType] = {
-    Seq(TimestampType, StringType)
+    Seq(AnyTime ++ AnyTimestampNano + TimestampType, StringType)
   }
 
   override def withNewChildrenInternal(newLeft: Expression, newRight: Expression): Expression = {
@@ -535,10 +564,23 @@ abstract class ToTimestamp extends BinaryExpression with ExpectsInputTypes {
 }
 
 /**
+ * [[org.apache.spark.sql.catalyst.expressions.UnixTime]].
+ */
+abstract class UnixTime extends ToTimestamp {
+
+  override def inputTypes: Seq[DataType] = {
+    Seq(
+      TypeSet(StringType, DateType, TimestampType, TimestampNTZType) ++ TypeSet.AnyTimestampNano,
+      StringType
+    )
+  }
+}
+
+/**
  * [[org.apache.spark.sql.catalyst.expressions.ToUnixTimestamp]].
  */
 case class ToUnixTimestamp(timeExp: Expression, format: Expression, timeZoneId: Option[String])
-    extends ToTimestamp {
+    extends UnixTime {
 
   override def left: Expression = timeExp
 
@@ -553,7 +595,7 @@ case class ToUnixTimestamp(timeExp: Expression, format: Expression, timeZoneId: 
  * [[org.apache.spark.sql.catalyst.expressions.UnixTimestamp]].
  */
 case class UnixTimestamp(timeExp: Expression, format: Expression, timeZoneId: Option[String])
-    extends ToTimestamp {
+    extends UnixTime {
 
   override def left: Expression = timeExp
 
@@ -598,9 +640,10 @@ case class TimeAdd(start: Expression, interval: Expression) extends BinaryExpres
   override def dataType: DataType = start.dataType
 
   override def resolveDataType(outputType: DataType): Expression = {
+    val startDataType = outputType.intersect(TypeSet.AnyTimestamp ++ TypeSet.AnyTimestampNano)
     withNewChildren(
       IndexedSeq(
-        start.resolveDataType(outputType.intersect(TypeSet.AnyTimestamp)),
+        start.resolveDataType(startDataType),
         interval.resolveDataType(TypeSet(CalendarIntervalType, DayTimeIntervalType))
       )
     )
@@ -624,9 +667,10 @@ case class TimestampAddYMInterval(timestamp: Expression, interval: Expression)
   override def dataType: DataType = timestamp.dataType
 
   override def resolveDataType(outputType: DataType): Expression = {
+    val timestampDataType = outputType.intersect(TypeSet.AnyTimestamp ++ TypeSet.AnyTimestampNano)
     withNewChildren(
       IndexedSeq(
-        timestamp.resolveDataType(outputType.intersect(TypeSet.AnyTimestamp)),
+        timestamp.resolveDataType(timestampDataType),
         interval.resolveDataType(YearMonthIntervalType)
       )
     )
@@ -693,17 +737,21 @@ case class ToUTCTimestamp(left: Expression, right: Expression) extends UTCTimest
  * [[org.apache.spark.sql.catalyst.expressions.TruncTimestamp]].
  */
 case class TruncTimestamp(format: Expression, timestamp: Expression, timeZoneId: Option[String])
-    extends BinaryExpression
-    with ExpectsInputTypes {
+    extends BinaryExpression {
 
   override def left: Expression = format
 
   override def right: Expression = timestamp
 
-  override def dataType: DataType = TimestampType
+  override def dataType: DataType = timestamp.dataType
 
-  override def inputTypes: Seq[DataType] = {
-    Seq(StringType, TimestampType)
+  override def resolveDataType(outputType: DataType): Expression = {
+    withNewChildren(
+      IndexedSeq(
+        format.resolveDataType(StringType),
+        timestamp.resolveDataType(outputType.intersect(TypeSet.AnyTimestampNano + TimestampType))
+      )
+    )
   }
 
   override def withNewChildrenInternal(newLeft: Expression, newRight: Expression): Expression = {
@@ -838,7 +886,8 @@ case class SubtractTimestamps(left: Expression, right: Expression, dataType: Dat
 
   override def resolveDataType(outputType: DataType): Expression = {
     val newDataType = outputType.intersect(dataType)
-    withNewDataType(newDataType).mapChildren(_.resolveDataType(TypeSet.AnyTimestamp))
+    val childDataType = TypeSet.AnyTimestamp ++ TypeSet.AnyTimestampNano
+    withNewDataType(newDataType).mapChildren(_.resolveDataType(childDataType))
   }
 
   override def withNewDataTypeInternal(newDataType: DataType): Expression = {

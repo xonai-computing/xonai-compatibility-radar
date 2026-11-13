@@ -63,6 +63,8 @@ class DataTypeParserSuite extends AnyFunSuite {
     "date" parseCatalogStringIs DateType
     "timestamp" parseCatalogStringIs TimestampType
     "timestamp_ntz" parseCatalogStringIs TimestampNTZType
+    "timestamp_ntz(7)" parseCatalogStringIs TimestampNTZNanosType
+    "timestamp_ltz(7)" parseCatalogStringIs TimestampLTZNanosType
     "interval" parseCatalogStringIs CalendarIntervalType
     "interval day to second" parseCatalogStringIs DayTimeIntervalType
     "interval year to month" parseCatalogStringIs YearMonthIntervalType
@@ -110,6 +112,8 @@ class DataTypeParserSuite extends AnyFunSuite {
     "DateType" parseToStringIs DateType
     "TimestampType" parseToStringIs TimestampType
     "TimestampNTZType" parseToStringIs TimestampNTZType
+    "TimestampNTZNanosType(7)" parseToStringIs TimestampNTZNanosType
+    "TimestampLTZNanosType(7)" parseToStringIs TimestampLTZNanosType
     "CalendarIntervalType" parseToStringIs CalendarIntervalType
     "DayTimeIntervalType(0,3)" parseToStringIs DayTimeIntervalType
     "YearMonthIntervalType(0,1)" parseToStringIs YearMonthIntervalType

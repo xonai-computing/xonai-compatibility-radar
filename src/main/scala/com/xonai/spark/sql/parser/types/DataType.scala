@@ -293,6 +293,8 @@ case object BinaryType extends DataType
 case object DateType extends DataType
 case object TimestampType extends DataType
 case object TimestampNTZType extends DataType
+case object TimestampLTZNanosType extends DataType
+case object TimestampNTZNanosType extends DataType
 case object CalendarIntervalType extends DataType
 case object DayTimeIntervalType extends DataType
 case object YearMonthIntervalType extends DataType
@@ -343,6 +345,10 @@ case class TypeSet(types: Set[DataType]) extends DataType {
     DataType(types ++ dataTypes)
   }
 
+  def ++(typeSet: TypeSet): TypeSet = {
+    TypeSet(types ++ typeSet.types)
+  }
+
   def map(f: DataType => DataType): DataType = {
     DataType(types.map(f))
   }
@@ -372,10 +378,17 @@ object TypeSet {
   lazy val AnyTimestamp =
     TypeSet(TimestampType, TimestampNTZType)
 
+  lazy val AnyTimestampNano =
+    TypeSet(TimestampNTZNanosType, TimestampLTZNanosType)
+
+  lazy val AnyTime =
+    TypeSet(TimeType)
+
   lazy val Atomic =
     TypeSet(
       NumericAndAnsiInterval.types ++
-        AnyTimestamp.types +
+        AnyTimestamp.types ++
+        AnyTimestampNano.types +
         BooleanType +
         DateType +
         StringType +

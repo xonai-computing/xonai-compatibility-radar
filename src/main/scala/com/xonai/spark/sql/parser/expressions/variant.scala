@@ -16,7 +16,7 @@
 
 package com.xonai.spark.sql.parser.expressions
 
-import com.xonai.spark.sql.parser.types.{DataType, StringType, VariantType}
+import com.xonai.spark.sql.parser.types.{AnyType, BooleanType, DataType, StringType, VariantType}
 
 /**
  * [[org.apache.spark.sql.catalyst.expressions.variant.ParseJson]].
@@ -108,5 +108,142 @@ case class IsValidVariant(child: Expression)
 
   override def withNewChildInternal(newChild: Expression): Expression = {
     copy(child = newChild)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.variant.VariantDelete]].
+ */
+case class VariantDelete(children: IndexedSeq[Expression])
+    extends Expression
+    with ExpectsInputTypes {
+
+  override def dataType: DataType = VariantType
+
+  override def inputTypes: Seq[DataType] = {
+    VariantType +: Seq.fill(math.max(children.length - 1, 0))(StringType)
+  }
+
+  override def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
+    copy(children = newChildren)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.variant.VariantInsert]].
+ */
+case class VariantInsert(
+    input: Expression,
+    path: Expression,
+    value: Expression,
+    failOnError: Boolean
+) extends TernaryExpression with ExpectsInputTypes {
+
+  override def dataType: DataType = VariantType
+
+  override def inputTypes: Seq[DataType] = {
+    Seq(VariantType, StringType, AnyType)
+  }
+
+  override def first: Expression = input
+
+  override def second: Expression = path
+
+  override def third: Expression = value
+
+  override def withNewChildrenInternal(
+      newFirst: Expression,
+      newSecond: Expression,
+      newThird: Expression
+  ): Expression = {
+    copy(input = newFirst, path = newSecond, value = newThird)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.variant.VariantSet]].
+ */
+case class VariantSet(
+    input: Expression,
+    path: Expression,
+    value: Expression,
+    createIfMissing: Expression,
+    failOnError: Boolean
+) extends QuaternaryExpression with ExpectsInputTypes {
+
+  override def dataType: DataType = VariantType
+
+  override def inputTypes: Seq[DataType] = {
+    Seq(VariantType, StringType, AnyType, BooleanType)
+  }
+
+  override def first: Expression = input
+
+  override def second: Expression = path
+
+  override def third: Expression = value
+
+  override def fourth: Expression = createIfMissing
+
+  override def withNewChildrenInternal(
+      newFirst: Expression,
+      newSecond: Expression,
+      newThird: Expression,
+      newFourth: Expression
+  ): Expression = {
+    copy(input = newFirst, path = newSecond, value = newThird, createIfMissing = newFourth)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.variant.VariantArrayAppend]].
+ */
+case class VariantArrayAppend(
+    input: Expression,
+    path: Expression,
+    value: Expression,
+    failOnError: Boolean
+) extends TernaryExpression with ExpectsInputTypes {
+
+  override def dataType: DataType = VariantType
+
+  override def inputTypes: Seq[DataType] = {
+    Seq(VariantType, StringType, AnyType)
+  }
+
+  override def first: Expression = input
+
+  override def second: Expression = path
+
+  override def third: Expression = value
+
+  override def withNewChildrenInternal(
+      newFirst: Expression,
+      newSecond: Expression,
+      newThird: Expression
+  ): Expression = {
+    copy(input = newFirst, path = newSecond, value = newThird)
+  }
+}
+
+/**
+ * [[org.apache.spark.sql.catalyst.expressions.variant.VariantStripNulls]].
+ */
+case class VariantStripNulls(child: Expression, includeArrays: Expression)
+    extends BinaryExpression
+    with ExpectsInputTypes {
+
+  override def dataType: DataType = VariantType
+
+  override def inputTypes: Seq[DataType] = {
+    Seq(VariantType, BooleanType)
+  }
+
+  override def left: Expression = child
+
+  override def right: Expression = includeArrays
+
+  override def withNewChildrenInternal(newLeft: Expression, newRight: Expression): Expression = {
+    copy(child = newLeft, includeArrays = newRight)
   }
 }

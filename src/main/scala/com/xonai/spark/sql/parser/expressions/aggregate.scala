@@ -335,6 +335,25 @@ case class CollectSet(child: Expression)
 }
 
 /**
+ * [[org.apache.spark.sql.catalyst.expressions.aggregate.CollectUnion]].
+ */
+case class CollectUnion(child: Expression, ignoreNulls: Boolean)
+    extends TypedImperativeAggregate
+    with UnaryLike[Expression] {
+
+  override def dataType: DataType = child.dataType
+
+  override def resolveDataType(outputType: DataType): Expression = {
+    val newDataType = outputType.intersect(ArrayType(AnyType))
+    mapChildren(_.resolveDataType(newDataType))
+  }
+
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
+  }
+}
+
+/**
  * [[org.apache.spark.sql.catalyst.expressions.aggregate.Mode]].
  */
 case class Mode(child: Expression)
